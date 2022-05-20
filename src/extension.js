@@ -6,7 +6,7 @@ const cheerio = require("cheerio");
 var Walk = require("@root/walk");
 
 // load root webview document
-var $ = cheerio.load(fs.readFileSync(path.join(__dirname, "..", 'webview.html'), { encoding: 'utf8' }))
+var $ = cheerio.load(fs.readFileSync(path.join(__dirname, 'webview.html'), { encoding: 'utf8' }))
 
 let settings = vscode.workspace.getConfiguration('draw');
 
