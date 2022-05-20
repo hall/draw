@@ -1,0 +1,78 @@
+include:
+  - template: SAST.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
+  - template: License-Scanning.gitlab-ci.yml
+  - template: Secret-Detection.gitlab-ci.yml
+
+# run the pipeline only on MRs, tags, and default branch
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+image: node:14-slim
+
+stages:
+  - test
+  - package
+  - publish
+
+lint:
+  stage: test
+  script:
+    - npm ci
+    # - cd src/webview && npm ci && cd ../.. # webview dependencies
+    # - npm run lint
+
+.package:
+  stage: package
+  script:
+    - npx vsce package
+  artifacts:
+    paths:
+      - "*.vsix"
+
+package_release:
+  extends: .package
+  artifacts:
+    expire_in: 1 year
+  only:
+    - tags
+
+package_test:
+  extends: .package
+  artifacts:
+    expire_in: 10 days
+  except:
+    - tags
+
+publish:
+  stage: publish
+  script:
+    - npx ovsx publish *.vsix -p $OPENVSX_ACCESS_TOKEN
+    - npx vsce publish --packagePath *.vsix -p $AZURE_ACCESS_TOKEN
+  when: manual
+  only:
+    - tags
+
+# https://gitlab.com/gitlab-org/gitlab-vscode-extension/-/blob/main/.gitlab-ci.yml
+# run security scanning on every pipeline execution; https://gitlab.com/gitlab-org/gitlab/-/issues/217668
+.secure-jobs-config: &secure-jobs-config
+  needs: []
+  rules:
+    - when: on_success
+gemnasium-dependency_scanning:
+  <<: *secure-jobs-config
+license_scanning:
+  <<: *secure-jobs-config
+eslint-sast:
+  <<: *secure-jobs-config
+nodejs-scan-sast:
+  <<: *secure-jobs-config
+secret_detection:
+  <<: *secure-jobs-config
+  # secrets detection can't run on tags: https://gitlab.com/gitlab-org/gitlab/-/issues/254199
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: "never"
