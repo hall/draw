@@ -26,13 +26,13 @@ function loadWebviewFiles(err, pathname, dirent) {
 
   let content = fs.readFileSync(pathname)
   switch (path.extname(pathname).substring(1)) {
-      case 'css':
+    case 'css':
       $("head").append('<style>' + content + '</style>')
       break;
-      case 'js':
+    case 'js':
       $("body").append('<script nonce="ToBeReplacedByRandomToken">' + content + '</script>')
       break;
-    }
+  }
   return Promise.resolve();
 }
 
@@ -81,9 +81,6 @@ function activate(context) {
             return;
           case 'editCurrentLine':
             setEditorText(message.text, message.control);
-            return;
-          case 'readFile':
-            currentPanel.webview.postMessage({ command: 'readFile', content: readFile(message.file) });
             return;
         }
       },
@@ -153,6 +150,10 @@ function activate(context) {
         updateCheckStrings[0] = text
         currentEditor = currentEditor_
         currentLine = currentLine_
+        if (settings.directory) {
+          let link = readLink(currentEditor.document.languageId, text)
+          if (link) text = fs.readFileSync(path.join(vscode.workspace.rootPath, link), { encoding: 'utf-8' })
+        }
         if (topush) {
           currentPanel.webview.postMessage({ command: 'currentLine', content: text });
         }
@@ -169,9 +170,63 @@ function activate(context) {
     fs.writeFileSync(path.join(dir, filename), text, { encoding: 'utf8' });
   }
 
-  // return contents of filename
-  function readFile(filename) {
-    return fs.readFileSync(path.join(vscode.workspace.rootPath, filename), { encoding: 'utf8' });
+  // return language formatted link to filename; optionally, with alt text
+  function createLink(language, filename, alt) {
+    // https://hyperpolyglot.org/lightweight-markup
+    switch (language) {
+
+      case 'markdown':
+        return `![${alt}](${filename})`
+
+      case 'asciidoc':
+        return `image::${filename}[${alt}]`
+
+      case 'restructuredtext':
+        return `.. image:: ${filename}` // TODO: add alt text `\n   :alt: ${alt}`
+
+      // case 'mediawiki':
+      //   return `[[File:${filename}|alt=${alt}]]`
+
+      // case 'org':
+      //   return `[[${filename}]]`
+
+    }
+  }
+
+  Array.prototype.swap = function (a, b) {
+    this[a] = this.splice(b, 1, this[a])[0]
+    return this
+  }
+
+  // return alt text and filename (in that order) from link in language format
+  function readLink(language, link) {
+    // https://hyperpolyglot.org/lightweight-markup
+    let match;
+    switch (language) {
+
+      case 'markdown':
+        match = link.match(/!\[(.*)\]\((.*)\)/)
+        break
+
+      case 'asciidoc':
+        match = link.match(/image::(.*)\[(.*)\]/)
+        if (match) match.swap(1, 2)
+        break
+
+      case 'restructuredtext':
+        // TODO: support multiline text for alt
+        match = link.match(/..() image:: (.*)/)
+        break
+
+      // case 'mediawiki':
+      //   match = link.match()
+      //   break
+
+      // case 'org':
+      //   match = link.match()
+      //   break
+    }
+    if (match) return match[1], match[2]
   }
 
   function setEditorText(text, control) {
@@ -186,7 +241,8 @@ function activate(context) {
       }
 
       writeFile(text, filename)
-      text = `![${alt}](${settings.directory}/${filename})`
+      let name = path.join(settings.directory, filename)
+      text = createLink(currentEditor.document.languageId, name, alt)
     }
 
     if (!currentEditor || currentEditor.document.isClosed) {
