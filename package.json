@@ -4,6 +4,7 @@
 	"description": "Draw an SVG image with a mouse or pen",
 	"version": "0.1.0",
 	"publisher": "hall",
+	"icon": "docs/images/icon.png",
 	"license": "Apache-2.0",
 	"repository": {
 		"url": "https://gitlab.com/hall/draw.git"
