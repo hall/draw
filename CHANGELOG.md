@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.1.1] - 2022-05-20
 ## Fixed
 - set webview color based on vscode light/dark theme
 
