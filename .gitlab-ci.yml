@@ -51,6 +51,7 @@ package_test:
 publish:
   stage: publish
   script:
+    - npm ci
     - npx ovsx publish *.vsix -p $OPENVSX_ACCESS_TOKEN
     - npx vsce publish --packagePath *.vsix -p $AZURE_ACCESS_TOKEN
   when: manual
