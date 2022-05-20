@@ -1207,10 +1207,11 @@ function initPaint(svgId, conf = null) {
     });
   })
 
-  document.querySelector("#svg-show-text").addEventListener("click", e => {
-    let value = document.querySelector('#svg-text').value
-    if (value) window?.drawAPI.unstable.copyToClipboard(value);
-  });
+  // TODO: element is currently commented-out
+  // document.querySelector("#svg-show-text").addEventListener("click", e => {
+  //   let value = document.querySelector('#svg-text').value
+  //   if (value) window?.drawAPI.unstable.copyToClipboard(value);
+  // });
 
   return { reInit };
 }
