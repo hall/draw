@@ -8,7 +8,7 @@ var Walk = require("@root/walk");
 // load root webview document
 var $ = cheerio.load(fs.readFileSync(path.join(__dirname, "..", 'webview.html'), { encoding: 'utf8' }))
 
-let settings = vscode.workspace.getConfiguration('markdown-draw');
+let settings = vscode.workspace.getConfiguration('draw');
 
 function getNonce() {
   let text = '';
@@ -37,7 +37,7 @@ function loadWebviewFiles(err, pathname, dirent) {
 }
 
 var webviewContent;
-Walk.walk(path.join(__dirname, "..", "board"), loadWebviewFiles).then(function () {
+Walk.walk(path.join(__dirname, "webview"), loadWebviewFiles).then(function () {
   webviewContent = $.root().html().replace(/ToBeReplacedByRandomToken/g, getNonce())
 });
 
@@ -274,12 +274,12 @@ function activate(context) {
   }
 
   function pushCustom() {
-    let customizedButtons = vscode.workspace.getConfiguration('markdown-draw')['customized-buttons'];
+    let customizedButtons = settings['customized-buttons'];
     currentPanel.webview.postMessage({ command: 'custom', content: { operate: customizedButtons } });
   }
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('markdownDraw.editCurrentLineAsSVG', () => {
+    vscode.commands.registerCommand('draw.editCurrentLineAsSVG', () => {
       if (currentPanel) {
         showPanel()
         pushCurrentLine()

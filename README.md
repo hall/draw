@@ -11,10 +11,16 @@ Draw an SVG image with a mouse or pen.
 
 ## Usage
 
-Open a markdown file and run `Edit/Create current line as SVG` by either
+Open a file (in a supported format) and run `Edit/Create current line as SVG` by either
 
  - right clicking on the line or
  - opening the command palette (`F1` or `Ctrl-Shft-P`) and type `svg`
+
+The currently supported formats are
+
+ - markdown
+ - asciidoc
+ - restructuredtext
 
 ## Custom Buttons
 
@@ -43,7 +49,7 @@ Add custom buttons to the drawing canvas.
  3. set the output string in `settings.json`
 
     ```json
-        "markdown-draw.customized-buttons": [
+        "draw.customized-buttons": [
             {
                 "type": "script",
                 "version": "0.1.2",

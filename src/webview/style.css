@@ -17,17 +17,19 @@ html {
   padding: 0px;
 }
 
-/* 滚动槽 */
+/* rolling groove */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   border-radius: 3px;
   background: rgba(0, 0, 0, 0.06);
   -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
 }
-/* 滚动条滑块 */
+
+/* scrollbar slider */
 ::-webkit-scrollbar-thumb {
   border-radius: 3px;
   background: rgba(0, 0, 0, 0.12);
@@ -69,9 +71,7 @@ select {
   padding: 0.25rem 0.4rem;
   vertical-align: middle;
   width: 100%;
-  background: #fff
-    url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23667189'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E")
-    no-repeat right 0.35rem center/.4rem 0.5rem;
+  background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23667189'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E") no-repeat right 0.35rem center/.4rem 0.5rem;
   padding-right: 1.2rem;
   margin-bottom: 0.5rem;
 }
@@ -102,7 +102,7 @@ select {
 
 .svg-container {
   /* float: left; */
-  height: calc(99vh - 35px - 42px);
+  height: calc(99vh - 44px);
   /* width: 70%; */
 }
 
@@ -111,7 +111,10 @@ select {
   cursor: crosshair;
   padding: 0px;
   touch-action: none;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wUYFQUEEgalnQAAACpJREFUOMvtzEEBAAAIAjHOKvbPiCXwxwIM20oBdhTWsGHDhg2fQiRtMjxX7gNtpyrSwgAAAABJRU5ErkJggg==");
+  background-size: 20px 20px;
+  background-image:
+    linear-gradient(to right, grey 1px, transparent 1px),
+    linear-gradient(to bottom, grey 1px, transparent 1px);
   width: 100%;
   height: 100%;
 }
@@ -132,6 +135,7 @@ select {
   .svg-container {
     height: calc(98vh - 51px - 42px);
   }
+
   .svg-button {
     height: 51px;
   }
@@ -142,7 +146,7 @@ select {
   margin-bottom: 5px;
 }
 
-.svg-button > div {
+.svg-button>div {
   display: inline;
   list-style: none;
   margin: 0px;
@@ -153,18 +157,18 @@ select {
   margin-right: 25px;
 }
 
-.svg-button > div div {
+.svg-button>div div {
   display: inline-block;
   margin-right: 10px;
   font-size: 15px;
   cursor: default;
 }
 
-.svg-button > div div:hover {
+.svg-button>div div:hover {
   color: rgba(97, 144, 232, 0.63);
 }
 
-.svg-button > div span {
+.svg-button>div span {
   font-size: 13px;
 }
 
@@ -177,9 +181,11 @@ select {
 .svg-button .can-size .small {
   font-size: 12px;
 }
+
 .svg-button .can-size .middle {
   font-size: 16px;
 }
+
 .svg-button .can-size .big {
   font-size: 18px;
 }

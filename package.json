@@ -20,6 +20,8 @@
 	],
 	"keywords": [
 		"markdown",
+		"asciidoc",
+		"restructuredtext",
 		"note",
 		"draw",
 		"latex",
@@ -28,14 +30,14 @@
 		"svg"
 	],
 	"activationEvents": [
-		"onCommand:markdownDraw.editCurrentLineAsSVG",
+		"onCommand:draw.editCurrentLineAsSVG",
 		"onLanguage:markdown"
 	],
 	"main": "./src/extension",
 	"contributes": {
 		"commands": [
 			{
-				"command": "markdownDraw.editCurrentLineAsSVG",
+				"command": "draw.editCurrentLineAsSVG",
 				"title": "Edit/Create current line as SVG",
 				"category": "Draw"
 			}
@@ -43,7 +45,7 @@
 		"menus": {
 			"editor/context": [
 				{
-					"command": "markdownDraw.editCurrentLineAsSVG",
+					"command": "draw.editCurrentLineAsSVG",
 					"when": "editorFocus",
 					"group": "7_modification"
 				}
@@ -53,7 +55,7 @@
 			"type": "object",
 			"title": "Draw",
 			"properties": {
-				"markdown-draw.customized-buttons": {
+				"draw.customized-buttons": {
 					"type": "array",
 					"default": [
 						{
@@ -68,7 +70,7 @@
 					],
 					"description": "Add customized buttons. See README.md for details"
 				},
-				"markdown-draw.directory": {
+				"draw.directory": {
 					"type": "string",
 					"default": "",
 					"description": "Save SVG to directory; write SVG inline if blank"
