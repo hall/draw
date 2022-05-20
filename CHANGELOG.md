@@ -1,27 +1,12 @@
-# Change Log
+# Changelog
+All notable changes to this project will be documented in this file.
 
-## 0.1.4 (2021-03-01)
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-HTR to latex (by mathpix API)  
-Drag and paste image to latex (by mathpix API)  
+## [Unreleased]
 
-## 0.1.3 (2020-12-08)
-
-icon
-
-## 0.1.2 (2020-12-06)
-
-HTR to latex (by myscript API)  
-Customize buttons  
-CSP script nonce
-
-## 0.1.1 (2020-11-29)
-
-Initial Release
-
-A prototype which is just able to draw.  
-Lots of bug and todo.
-
-## 0.1.0 (2020-11-17)
-
-Initial Project
+## [0.1.0] - 2022-05-20
+### Added
+- save svg to external file
+- toggle svg text preview element
