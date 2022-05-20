@@ -1,7 +1,7 @@
 # Draw, for the VSCode family
 
-![Open VSX Version](https://img.shields.io/open-vsx/v/hall/draw)
-![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/hall.draw)
+[![Open VSX Version](https://img.shields.io/open-vsx/v/hall/draw)](https://open-vsx.org/extension/hall/draw)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/hall.draw)](https://marketplace.visualstudio.com/items?itemName=hall.draw)
 
 Draw an SVG image with a mouse or pen.
 
