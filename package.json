@@ -55,20 +55,32 @@
 			"type": "object",
 			"title": "Draw",
 			"properties": {
-				"draw.customized-buttons": {
+				"draw.buttons": {
 					"type": "array",
-					"default": [
-						{
-							"type": "comment",
-							"content": "change the type of next object to script to run the demo. See https://github.com/zhaouv/vscode-markdown-draw#customize-buttons for details"
+					"default": [],
+					"description": "Add custom buttons to the toolbar",
+					"items": {
+						"type": "object",
+						"properties": {
+							"icon": {
+								"type": "string",
+								"description": "font awesome icon name"
+							},
+							"title": {
+								"type": "string",
+								"description": "button title, shown on hover"
+							},
+							"function": {
+								"type": "string",
+								"description": "javascript function to execute on button click"
+							}
 						},
-						{
-							"type": "script_demo",
-							"function": "    // find a icon from https://fontawesome.com/v5.8.2/icons\n    const icon = 'dice-one' \n    const title = 'a new button'\n    const addGap = false\n    const onclick = ()=>{\n        drawAPI.unstable.setTextContent('a custom button works')\n    }\n\n    document.querySelector('div.svg-operate').insertAdjacentHTML('beforeEnd',(addGap?\"<span class='svgiconspliter'></span>\":\"\")+\"<div class='svg-btn fa fa-\"+icon+\"' title='\"+title+\"'><span></span></div>\");\n    document.querySelector('div.svg-operate > :last-child').onclick=onclick\n",
-							"version": "0.1.2"
-						}
-					],
-					"description": "Add customized buttons. See README.md for details"
+						"required": [
+							"icon",
+							"title",
+							"function"
+						]
+					}
 				},
 				"draw.directory": {
 					"type": "string",

@@ -276,8 +276,10 @@ function activate(context) {
   }
 
   function pushCustom() {
-    let customizedButtons = settings['customized-buttons'];
-    currentPanel.webview.postMessage({ command: 'custom', content: { operate: customizedButtons } });
+    currentPanel.webview.postMessage({
+      command: 'customButtons',
+      content: settings['buttons']
+    });
   }
 
   context.subscriptions.push(

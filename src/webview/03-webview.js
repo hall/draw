@@ -86,17 +86,17 @@ const drawAPI = {
       }
     },
     custom(content) {
-      console.log(content);
-      if (content.operate) {
-        content.operate.forEach(drawAPI.unstable.customOperate);
-      }
-    },
-    customOperate(operate) {
-      console.log(operate);
-      if (operate.type === 'script') {
-        let func = new Function(operate.function)
-        func()
-      }
+      content.forEach((c) => {
+        if (c.type === undefined || c.type === 'script') {
+          let elm = document.querySelector('div.custom-buttons')
+          elm.insertAdjacentHTML('beforeEnd',
+            `<div class='svg-btn fa fa-${c.icon}' title='${c.title}'>
+             <span></span>
+           </div>`
+          );
+          elm.onclick = new Function(c.function)
+        }
+      });
     },
   },
 }
@@ -112,7 +112,7 @@ window.addEventListener('message', event => {
     case 'currentLine':
       drawAPI.unstable.setContent(message.content);
       break;
-    case 'custom':
+    case 'customButtons':
       drawAPI.unstable.custom(message.content);
       break;
   }
