@@ -1,16 +1,15 @@
 {
-	"name": "vscode-markdown-draw",
-	"displayName": "Draw Note",
-	"description": "Draw svg quick-responsively with a mouse or pen, designed for note-taking, formulas drafting. HTR/OCR to latex supported.[Prototype stage now!]",
-	"version": "0.1.4",
-	"publisher": "zhaouv",
-	"icon": "img_md/icon.png",
+	"name": "draw",
+	"displayName": "Draw",
+	"description": "Draw an SVG image with a mouse or pen",
+	"version": "0.1.0",
+	"publisher": "hall",
 	"license": "Apache-2.0",
 	"repository": {
-		"url": "https://github.com/zhaouv/vscode-markdown-draw.git"
+		"url": "https://gitlab.com/hall/draw.git"
 	},
 	"bugs": {
-		"url": "https://github.com/zhaouv/vscode-markdown-draw/issues"
+		"url": "https://gitlab.com/hall/draw/issues"
 	},
 	"engines": {
 		"vscode": "^1.47.0"
@@ -37,7 +36,7 @@
 			{
 				"command": "markdownDraw.editCurrentLineAsSVG",
 				"title": "Edit/Create current line as SVG",
-				"category": "Markdown Draw"
+				"category": "Draw"
 			}
 		],
 		"menus": {
@@ -51,7 +50,7 @@
 		},
 		"configuration": {
 			"type": "object",
-			"title": "Draw Note",
+			"title": "Draw",
 			"properties": {
 				"markdown-draw.customized-buttons": {
 					"type": "array",
