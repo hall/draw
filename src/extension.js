@@ -81,6 +81,8 @@ function activate(context) {
             return;
           case 'editCurrentLine':
             setEditorText(message.text, message.control);
+          case 'copyToClipboard':
+            vscode.env.clipboard.writeText(message.text);
             return;
         }
       },

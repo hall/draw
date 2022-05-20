@@ -7,7 +7,7 @@ if (typeof require !== 'undefined') {
 const exposedFunctions = initPaint("svg");
 
 const svgElement = document.getElementById('svg')
-const lineContentInput = document.querySelector('input[type=text]');
+const lineContentInput = document.querySelector('#svg-text');
 
 const drawAPI = {
   unstable: {
@@ -145,6 +145,12 @@ document.querySelector('#text-change-nextline').onclick = function () {
         text,
         control,
         command: 'editCurrentLine',
+      })
+    }
+    drawAPI.unstable.copyToClipboard = (text) => {
+      vscode.postMessage({
+        text,
+        command: 'copyToClipboard',
       })
     }
     vscode.postMessage({ command: 'requestCurrentLine' })

@@ -1208,12 +1208,8 @@ function initPaint(svgId, conf = null) {
   })
 
   document.querySelector("#svg-show-text").addEventListener("click", e => {
-    let text = document.querySelector('#svg-text');
-    if (text.style.display === 'none') {
-      text.style.display = ''
-    } else {
-      text.style.display = 'none'
-    }
+    let value = document.querySelector('#svg-text').value
+    if (value) window?.drawAPI.unstable.copyToClipboard(value);
   });
 
   return { reInit };
