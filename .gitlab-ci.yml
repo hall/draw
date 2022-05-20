@@ -28,6 +28,7 @@ lint:
 .package:
   stage: package
   script:
+    - npm ci
     - npx vsce package
   artifacts:
     paths:
