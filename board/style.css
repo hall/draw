@@ -1,8 +1,15 @@
 body {
   overscroll-behavior: none;
-  color: #585858;
   margin: 0px;
   padding: 0px;
+}
+
+body.vscode-light {
+  color: #585858;
+}
+
+body.vscode-dark {
+  color: #a7a7a7;
 }
 
 html {
