@@ -1,5 +1,5 @@
 if (typeof require !== 'undefined') {
-  var { initPaint } = require('./main')
+  var { initPaint } = require('./02-main')
 } else {
   var { initPaint } = exports
 }

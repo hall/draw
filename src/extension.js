@@ -2,6 +2,11 @@ const vscode = require("vscode");
 const path = require("path");
 const fs = require("fs");
 const { v4: uuidv4 } = require('uuid');
+const cheerio = require("cheerio");
+var Walk = require("@root/walk");
+
+// load root webview document
+var $ = cheerio.load(fs.readFileSync(path.join(__dirname, "..", 'webview.html'), { encoding: 'utf8' }))
 
 let settings = vscode.workspace.getConfiguration('markdown-draw');
 
@@ -14,24 +19,27 @@ function getNonce() {
   return text;
 }
 
-function loadWebviewFiles(root) {
-  let main = fs.readFileSync(path.join(root, 'webview.html'), { encoding: 'utf8' })
-  main = main.replace(/<[^\n]*"\.\/board\/[^\n]*>/g, s => {
-    let m = /"\.\/board\/(.*?\.)(.*?)"/.exec(s)
-    let content = fs.readFileSync(path.join(root, 'board', m[1] + m[2]), { encoding: 'utf8' })
-    switch (m[2]) {
+
+// inject js/css into base html document
+function loadWebviewFiles(err, pathname, dirent) {
+  if (dirent.isDirectory()) return Promise.resolve();
+
+  let content = fs.readFileSync(pathname)
+  switch (path.extname(pathname).substring(1)) {
       case 'css':
-        return '<style>' + content + '</style>'
+      $("head").append('<style>' + content + '</style>')
+      break;
       case 'js':
-        return '<script nonce="ToBeReplacedByRandomToken">' + content + '</script>'
-      default:
-        return s
+      $("body").append('<script nonce="ToBeReplacedByRandomToken">' + content + '</script>')
+      break;
     }
-  })
-  main = main.replace(/ToBeReplacedByRandomToken/g, getNonce())
-  return main
+  return Promise.resolve();
 }
-const webviewContent = loadWebviewFiles(path.join(__dirname, '..'));
+
+var webviewContent;
+Walk.walk(path.join(__dirname, "..", "board"), loadWebviewFiles).then(function () {
+  webviewContent = $.root().html().replace(/ToBeReplacedByRandomToken/g, getNonce())
+});
 
 /** @param {vscode.ExtensionContext} context */
 function activate(context) {
@@ -51,7 +59,7 @@ function activate(context) {
     // Create and show panel
     currentPanel = vscode.window.createWebviewPanel(
       'drawNote',
-      'Draw Note',
+      'Draw',
       vscode.ViewColumn.Three,
       {
         // Enable scripts in the webview

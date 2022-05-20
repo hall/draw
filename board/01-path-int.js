@@ -24,7 +24,7 @@ var p2s = /,?([a-z]),?/gi,
 
 var isArray =
   Array.isArray ||
-  function(o) {
+  function (o) {
     return o instanceof Array;
   };
 
@@ -88,17 +88,17 @@ function parsePathString(pathString) {
   }
 
   var paramCounts = {
-      a: 7,
-      c: 6,
-      h: 1,
-      l: 2,
-      m: 2,
-      q: 4,
-      s: 4,
-      t: 2,
-      v: 1,
-      z: 0
-    },
+    a: 7,
+    c: 6,
+    h: 1,
+    l: 2,
+    m: 2,
+    q: 4,
+    s: 4,
+    t: 2,
+    v: 1,
+    z: 0
+  },
     data = [];
 
   if (isArray(pathString) && isArray(pathString[0])) {
@@ -107,11 +107,11 @@ function parsePathString(pathString) {
   }
 
   if (!data.length) {
-    String(pathString).replace(pathCommand, function(a, b, c) {
+    String(pathString).replace(pathCommand, function (a, b, c) {
       var params = [],
         name = b.toLowerCase();
 
-      c.replace(pathValues, function(a, b) {
+      c.replace(pathValues, function (a, b) {
         b && params.push(+b);
       });
 
@@ -147,7 +147,7 @@ function paths(ps) {
     };
   }
 
-  setTimeout(function() {
+  setTimeout(function () {
     for (var key in p) {
       if (hasProperty(p, key) && key != ps) {
         p[key].sleep--;
@@ -386,7 +386,7 @@ function findBezierIntersections(bez1, bez2, justCount) {
         xy[key] = true;
 
         var t1 =
-            di.t + abs((is[ci] - di[ci]) / (di1[ci] - di[ci])) * (di1.t - di.t),
+          di.t + abs((is[ci] - di[ci]) / (di1[ci] - di[ci])) * (di1.t - di.t),
           t2 =
             dj.t + abs((is[cj] - dj[cj]) / (dj1[cj] - dj[cj])) * (dj1.t - dj.t);
 
@@ -654,7 +654,7 @@ function arcToCurve(
     rad = (PI / 180) * (+angle || 0),
     res = [],
     xy,
-    rotate = cacher(function(x, y, rad) {
+    rotate = cacher(function (x, y, rad) {
       var X = x * math.cos(rad) - y * math.sin(rad),
         Y = x * math.sin(rad) + y * math.cos(rad);
 
@@ -687,7 +687,7 @@ function arcToCurve(
         math.sqrt(
           abs(
             (rx2 * ry2 - rx2 * y * y - ry2 * x * x) /
-              (rx2 * y * y + ry2 * x * x)
+            (rx2 * y * y + ry2 * x * x)
           )
         ),
       cx = (k * rx * y) / ry + (x1 + x2) / 2,
@@ -872,7 +872,7 @@ function pathToCurve(path) {
 
   var curvedPath = pathToAbsolute(path),
     attrs = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null },
-    processPath = function(path, d, pathCommand) {
+    processPath = function (path, d, pathCommand) {
       var nx, ny;
 
       if (!path) {
@@ -944,7 +944,7 @@ function pathToCurve(path) {
 
       return path;
     },
-    fixArc = function(pp, i) {
+    fixArc = function (pp, i) {
       if (pp[i].length > 7) {
         pp[i].shift();
         var pi = pp[i];

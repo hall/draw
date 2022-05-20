@@ -5,7 +5,7 @@
  */
 
 if (typeof require !== 'undefined') {
-  var { intersect } = require('./path-int')
+  var { intersect } = require('./01-path-int')
 } else {
   var { intersect } = exports
 }
