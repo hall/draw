@@ -1,9 +1,3 @@
-/**
- * This file contains source code adapted from syfxlin/graffiti-board (licensed Apache-2.0).
- *
- * @see https://github.com/syfxlin/graffiti-board/blob/5945b126c945073eced5e6eb78658bc2a7375881/main.js
- */
-
 if (typeof require !== 'undefined') {
   var { intersect } = require('./01-path-int')
 } else {
