@@ -88,13 +88,14 @@ const drawAPI = {
     custom(content) {
       content.forEach((c) => {
         if (c.type === undefined || c.type === 'script') {
+          let div = document.createElement("div")
+          div.classList.add("svg-btn", "fa", `fa-${c.icon}`)
+          div.title = c.title
+          div.innerHTML = "<span></span>"
+          div.onclick = new Function(c.function)
+
           let elm = document.querySelector('div.custom-buttons')
-          elm.insertAdjacentHTML('beforeEnd',
-            `<div class='svg-btn fa fa-${c.icon}' title='${c.title}'>
-             <span></span>
-           </div>`
-          );
-          elm.onclick = new Function(c.function)
+          elm.appendChild(div)
         }
       });
     },
@@ -114,6 +115,12 @@ window.addEventListener('message', event => {
       break;
     case 'customButtons':
       drawAPI.unstable.custom(message.content);
+      break;
+    case 'recognize':
+      switch (message.provider) {
+        case 'myscript':
+          myscript(message.token)
+      }
       break;
   }
 });
@@ -151,6 +158,13 @@ document.querySelector('#text-change-nextline').onclick = function () {
       vscode.postMessage({
         text,
         command: 'copyToClipboard',
+      })
+    }
+    // TODO: add loading spinner or something
+    drawAPI.unstable.recognize = (provider) => {
+      vscode.postMessage({
+        command: 'recognize',
+        provider: provider
       })
     }
     vscode.postMessage({ command: 'requestCurrentLine' })

@@ -5,6 +5,8 @@ const { v4: uuidv4 } = require('uuid');
 const cheerio = require("cheerio");
 var Walk = require("@root/walk");
 
+const hdr = require("./htr.js");
+
 // load root webview document
 var $ = cheerio.load(fs.readFileSync(path.join(__dirname, 'webview.html'), { encoding: 'utf8' }))
 
@@ -83,6 +85,15 @@ function activate(context) {
             setEditorText(message.text, message.control);
           case 'copyToClipboard':
             vscode.env.clipboard.writeText(message.text);
+            return;
+          case 'recognize':
+            context.secrets.get("token").then((token) => {
+              currentPanel.webview.postMessage({
+                command: 'recognize',
+                token: token,
+                provider: message.provider
+              });
+            })
             return;
         }
       },
@@ -232,7 +243,7 @@ function activate(context) {
   }
 
   function setEditorText(text, control) {
-    if (settings.directory) {
+    if (settings.directory && !text.startsWith("$$")) {
       let filename = `${uuidv4()}.svg`
       let alt = "";
 
@@ -276,10 +287,21 @@ function activate(context) {
   }
 
   function pushCustom() {
-    currentPanel.webview.postMessage({
-      command: 'customButtons',
-      content: settings['buttons']
-    });
+    let buttons = settings['buttons']
+    context.secrets.get("provider").then((provider) => {
+      if (provider) {
+        buttons = [{
+          icon: "square-root-alt",
+          title: "recognize to latex",
+          function: `window.drawAPI.unstable.recognize("${provider}")`
+        }].concat(buttons)
+      }
+
+      currentPanel.webview.postMessage({
+        command: 'customButtons',
+        content: buttons
+      });
+    })
   }
 
   context.subscriptions.push(
@@ -294,6 +316,9 @@ function activate(context) {
             pushCurrentLine()
           })
       }
+    }),
+    vscode.commands.registerCommand('draw.configureHDR', () => {
+      hdr.init(context, currentPanel);
     })
   );
 

@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2022-05-21
+### Changed
+- inline myscript HTR support
+- simplify custom buttons interface
+
 ## [0.1.3] - 2022-05-20
 ### Changed
 - update UI to closer match vscode's theme
