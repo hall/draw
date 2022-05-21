@@ -130,7 +130,7 @@ function initPaint(svgId, conf = null) {
   };
 
   var drawDown = e => {
-    // todo 也修改界面的显示
+    // TODO: also modify the display of the interface
     if (e.buttons === 32) {
       config.type = "eraser";
     }
@@ -1076,13 +1076,9 @@ function initPaint(svgId, conf = null) {
     }
   });
 
-  document.querySelectorAll(".svg-pen .svg-btn").forEach(item => {
-    item.addEventListener("click", e => {
-      if (document.querySelector(".svg-button .active")) {
-        document
-          .querySelector(".svg-button .active")
-          .classList.remove("active");
-      }
+  document.querySelectorAll(".svg-pen > i").forEach(item => {
+    click(item, e => {
+      document.querySelector(".svg-button .active")?.classList.remove("active");
       item.classList.add("active");
       config.type = item.getAttribute("data-type");
     });
@@ -1141,39 +1137,31 @@ function initPaint(svgId, conf = null) {
     config.fontSize = e.target.value;
   });
 
-  document.querySelectorAll(".svg-shape .svg-btn").forEach(item => {
-    item.addEventListener("click", e => {
-      if (document.querySelector(".svg-button .active")) {
-        document
-          .querySelector(".svg-button .active")
-          .classList.remove("active");
-      }
+  document.querySelectorAll(".svg-shape > i").forEach(item => {
+    click(item, (e) => {
+      document.querySelector(".svg-button .active")?.classList.remove("active");
       item.classList.add("active");
       config.type = item.getAttribute("data-type");
     });
   });
 
-  document.querySelector("#svg-undo").addEventListener("click", e => {
-    if (undoList.length < 1) {
-      return;
-    }
+  click("#svg-undo", (e) => {
+    if (undoList.length < 1) return;
     let undoEle = undoList.pop();
     undoEle.remove();
     redoList.push(undoEle);
     redoBoxSizeList.push(boxSizeList.pop());
   });
 
-  document.querySelector("#svg-redo").addEventListener("click", e => {
-    if (redoList.length < 1) {
-      return;
-    }
+  click("#svg-redo", (e) => {
+    if (redoList.length < 1) return;
     let redoEle = redoList.pop();
     svg.append(redoEle);
     undoList.push(redoEle);
     boxSizeList.push(redoBoxSizeList.pop());
   });
 
-  document.querySelector("#svg-clean").addEventListener("click", e => {
+  click("#svg-clean", (e) => {
     undoList = [];
     redoList = [];
     boxSizeList = [];
@@ -1181,22 +1169,14 @@ function initPaint(svgId, conf = null) {
     svg.innerHTML = "";
   });
 
-  document.querySelector("#svg-showsettings").addEventListener("click", e => {
-    let settings = document.querySelector('.svg-settings');
-    if (settings.style.display === 'none') {
-      settings.style.display = ''
-      document.querySelector("#svg-showsettings").classList.add("active");
-    } else {
-      settings.style.display = 'none'
-      document.querySelector("#svg-showsettings").classList.remove("active");
-    }
-  });
+  toggle("#show-settings", "#settings");
 
-  document.querySelector("#svg-nextline").addEventListener("click", e => {
+  click("#svg-nextline", e => {
     document.querySelector('#text-change-nextline')?.onclick()
   });
+
   (['change-stay', 'change-nextline']).forEach(s => {
-    document.querySelector("#svg-" + s).addEventListener("click", e => {
+    click("#svg-" + s, e => {
       let textarea = document.createElement("textarea");
       let { x, y, width, height } = svg.getBBox();
       textarea.value = svg.outerHTML.replace('<svg id="svg">',
@@ -1207,13 +1187,37 @@ function initPaint(svgId, conf = null) {
     });
   })
 
-  // TODO: element is currently commented-out
-  // document.querySelector("#svg-show-text").addEventListener("click", e => {
-  //   let value = document.querySelector('#svg-text').value
-  //   if (value) window?.drawAPI.unstable.copyToClipboard(value);
-  // });
-
   return { reInit };
+}
+
+// wrap icon in div to allow binding an onclick events
+function click(selector, callback) {
+  let elm = selector
+  if (typeof (selector) == "string") {
+    elm = document.querySelector(selector)
+  }
+  let div = document.createElement("div")
+  div.style.margin = 0;
+  elm.parentNode.insertBefore(div, elm)
+  div.appendChild(elm)
+
+  div.addEventListener("click", e => callback(e));
+}
+
+// toggle visibility of target when button is clicked
+function toggle(buttonSel, targetSel) {
+  button = document.querySelector(buttonSel)
+  target = document.querySelector(targetSel);
+  click(buttonSel, () => {
+    if (target.style.display === 'none') {
+      target.style.display = ''
+      button.classList.add("active");
+    } else {
+      target.style.display = 'none'
+      button.classList.remove("active");
+    }
+  })
+
 }
 
 exports.initPaint = initPaint

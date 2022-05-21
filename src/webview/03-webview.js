@@ -80,7 +80,7 @@ const drawAPI = {
     setContent(content) {
       drawAPI.unstable.setTextContent(content)
       document.querySelector("#svg-clean")?.dispatchEvent(new Event('click'))
-      // 不准确的检查, 先这么写
+      // inaccurate check, write this first
       if (content.startsWith('<svg id="svg"')) {
         drawAPI.unstable.setSVGContent(content)
       }
@@ -88,14 +88,14 @@ const drawAPI = {
     custom(content) {
       content.forEach((c) => {
         if (c.type === undefined || c.type === 'script') {
+          let icon = document.createElement("i")
+          icon.classList.add("fa", `fa-${c.icon}`)
+          icon.title = c.title
           let div = document.createElement("div")
-          div.classList.add("svg-btn", "fa", `fa-${c.icon}`)
-          div.title = c.title
-          div.innerHTML = "<span></span>"
+          div.appendChild(icon)
           div.onclick = new Function(c.function)
 
-          let elm = document.querySelector('div.custom-buttons')
-          elm.appendChild(div)
+          document.querySelector('div.custom-buttons').appendChild(div)
         }
       });
     },

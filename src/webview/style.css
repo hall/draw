@@ -10,64 +10,6 @@ body {
   color: --vscode-foreground;
 }
 
-/* rolling groove */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.06);
-  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
-}
-
-/* scrollbar slider */
-::-webkit-scrollbar-thumb {
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.12);
-  -webkit-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-input {
-  background: #fff;
-  background-image: none;
-  background-image: none;
-  border: 0.05rem solid #bcc3ce;
-  border-radius: 0.1rem;
-  color: #3b4351;
-  display: block;
-  font-size: 0.8rem;
-  height: 1.8rem;
-  line-height: 1.2rem;
-  max-width: 100%;
-  outline: 0;
-  padding: 0.25rem 0.4rem;
-  position: relative;
-  transition: background 0.2s, border 0.2s, box-shadow 0.2s, color 0.2s;
-  width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 0.5rem;
-}
-
-select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: 0.05rem solid #bcc3ce;
-  border-radius: 0.1rem;
-  color: inherit;
-  font-size: 0.8rem;
-  height: 1.8rem;
-  line-height: 1.2rem;
-  outline: 0;
-  padding: 0.25rem 0.4rem;
-  vertical-align: middle;
-  width: 100%;
-  background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%204%205'%3E%3Cpath%20fill='%23667189'%20d='M2%200L0%202h4zm0%205L0%203h4z'/%3E%3C/svg%3E") no-repeat right 0.35rem center/.4rem 0.5rem;
-  padding-right: 1.2rem;
-  margin-bottom: 0.5rem;
-}
 
 .title,
 .container {
@@ -76,20 +18,9 @@ select {
   position: relative;
 }
 
-.title h1 {
-  margin-bottom: 10px;
-}
-
-.title h5 {
-  margin: 5px 0px;
-}
-
-.title h5 a {
-  color: #6190e8;
-}
 
 .active {
-  color: #6190e8;
+  color: --vscode-selection-background;
 }
 
 .svg-container {
@@ -118,21 +49,6 @@ select {
   overflow-y: auto;
 }
 
-@media (max-width: 613px) {
-  .svg-container {
-    height: calc(98vh - 51px - 42px);
-  }
-
-  .svg-button {
-    height: 51px;
-  }
-}
-
-.svg-button h3 {
-  margin-top: 10px;
-  margin-bottom: 5px;
-}
-
 .svg-button>div {
   display: inline;
   list-style: none;
@@ -141,7 +57,10 @@ select {
 }
 
 .svgiconspliter {
-  margin-right: 25px;
+  /* border-left: 1px solid var(--vscode-panel-border);
+  border-right: 0 1px solid var(--vscode-panel-border); */
+  height: 12px;
+  margin: 0 8px;
 }
 
 .svg-button>div div {
@@ -152,6 +71,7 @@ select {
 }
 
 .svg-button>div div:hover {
+  /* TODO: css vars not work in hover pseudo class */
   color: rgba(97, 144, 232, 0.63);
 }
 
@@ -159,29 +79,31 @@ select {
   font-size: 13px;
 }
 
-.svg-button .can-color li {
-  border: 1.5px solid #ddd;
-  width: 20px;
-  height: 10px;
-}
 
-.svg-button .can-size .small {
-  font-size: 12px;
-}
-
-.svg-button .can-size .middle {
-  font-size: 16px;
-}
-
-.svg-button .can-size .big {
-  font-size: 18px;
-}
-
-#images {
+/*
+ #images {
   padding-top: 10px;
   clear: both;
-}
+} 
 
 #images textarea {
   border: 1.5px solid #6190e8;
+}
+*/
+
+#settings {
+  right: 0;
+  padding: 10px;
+  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(4, 0fr);
+  position: absolute;
+}
+
+#settings>select {
+  height: 100%;
+}
+
+#settings>input[type="number"] {
+  width: 3.2em;
 }

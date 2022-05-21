@@ -24,133 +24,96 @@
       <div class="svg-button">
 
         <div class="svg-pen">
-          <div class="svg-btn fa fa-pencil-alt" data-type="pen" title="pen">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-eraser" data-type="eraser" title="eraser">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-font" data-type="text" title="text">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-pencil-ruler" data-type="select" title="select">
-            <span></span>
-          </div>
+          <i class="fa fa-pencil-alt" data-type="pen" title="pen"></i>
+          <i class="fa fa-eraser" data-type="eraser" title="eraser"></i>
+          <i class="fa fa-font" data-type="text" title="text"></i>
+          <i class="fa fa-pencil-ruler" data-type="select" title="select"></i>
         </div>
         <span class="svgiconspliter"></span>
         <div class="svg-shape">
-          <div class="svg-btn fa fa-slash" data-type="line" title="line">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-draw-polygon" data-type="polygon" title="polygon">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-square-full" data-type="rect" title="rect">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-square" data-type="round-rect" title="round-rect">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-circle" data-type="circle" title="circle">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-hockey-puck" data-type="ellipse" title="ellipse">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-layer-group" data-type="diamond" title="diamond">
-            <span></span>
-          </div>
+          <i class="fa fa-slash" data-type="line" title="line"></i>
+          <i class="fa fa-draw-polygon" data-type="polygon" title="polygon"></i>
+          <i class="fa fa-square-full" data-type="rect" title="rect"></i>
+          <i class="fa fa-square" data-type="round-rect" title="round-rect"></i>
+          <i class="fa fa-circle" data-type="circle" title="circle"></i>
+          <i class="fa fa-hockey-puck" data-type="ellipse" title="ellipse"></i>
+          <i class="fa fa-layer-group" data-type="diamond" title="diamond"></i>
         </div>
         <span class="svgiconspliter"></span>
         <div class="svg-operate">
-          <div class="svg-btn fa fa-sliders-h" id="svg-showsettings" title="settings (unfinished now)">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-reply" id="svg-undo" title="undo">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-share" id="svg-redo" title="redo">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-trash" id="svg-clean" title="clear board">
-            <span></span>
-          </div>
-          <span class="svgiconspliter"></span>
-          <div class="svg-btn fa fa-arrow-down" id="svg-nextline" title="go next line">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-check-square" id="svg-change-stay" title="change and stay">
-            <span></span>
-          </div>
-          <div class="svg-btn fa fa-caret-square-down" id="svg-change-nextline" title="change and go next line">
-            <span></span>
-          </div>
+          <i class="fa fa-sliders-h" id="show-settings" title="settings"></i>
+          <i class="fa fa-reply" id="svg-undo" title="undo"></i>
+          <i class="fa fa-share" id="svg-redo" title="redo"></i>
+          <i class="fa fa-trash" id="svg-clean" title="clear board"></i>
+        </div>
+        <span class="svgiconspliter"></span>
+        <div>
+          <i class="fa fa-arrow-down" id="svg-nextline" title="go next line"></i>
+          <i class="fa fa-check-square" id="svg-change-stay" title="change and stay"></i>
+          <i class="fa fa-caret-square-down" id="svg-change-nextline" title="change and go next line"></i>
           <!--
             TODO: copy to clipboard currently only works after saving the document;
             candidate for removal as I'm not sure how useful this is
+          <i class="fa fa-clipboard" id="svg-show-text" title="show svg text"></i>
            -->
-          <!-- <div class="svg-btn fa fa-clipboard" id="svg-show-text" title="show svg text">
-            <span></span> -->
         </div>
         <span class="svgiconspliter"></span>
         <div class="custom-buttons"></div>
       </div>
     </div>
-    <div class="svg-settings" style="display: none;">
-      <h3>size</h3>
-      <div class="svg-size">
-        <select id="select-size">
-          <option value="small">small</option>
-          <option value="middle">middle</option>
-          <option value="big">big</option>
-          <option value="custom">custom</option>
-        </select>
-        <input type="number" id="custom-size" value="2" />
-      </div>
-      <h3>color</h3>
-      <div class="svg-color">
-        <select id="select-color">
-          <option value="black">black</option>
-          <option value="lightcoral">lightcoral</option>
-          <option value="lightblue" selected>lightblue</option>
-          <option value="lightgreen">lightgreen</option>
-          <option value="lightyellow">lightyellow</option>
-          <option value="lightsalmon">lightsalmon</option>
-          <option value="lightgray">lightgray</option>
-          <option value="lightpink">lightpink</option>
-          <option value="plum">plum</option>
-          <option value="custom">custom</option>
-        </select>
-        <input type="color" id="custom-color" />
-      </div>
-      <h3>fill</h3>
-      <div class="svg-fill-color">
-        <select id="select-fill-color">
-          <option value="none">none</option>
-          <option value="black">black</option>
-          <option value="lightcoral">lightcoral</option>
-          <option value="lightblue">lightblue</option>
-          <option value="lightgreen">lightgreen</option>
-          <option value="lightyellow">lightyellow</option>
-          <option value="lightsalmon">lightsalmon</option>
-          <option value="lightgray">lightgray</option>
-          <option value="lightpink">lightpink</option>
-          <option value="plum">plum</option>
-          <option value="custom">custom</option>
-        </select>
-        <input type="color" id="custom-fill-color" />
-      </div>
-      <h3>text size</h3>
-      <div class="svg-text-size">
-        <input type="number" id="text-size" value="14" />
-      </div>
-    </div>
-    <div class="svg-container">
-      <svg id="svg"></svg>
-    </div>
-    <div id="images" style="display: none;"></div>
 
+    <form id="settings" style="display: none;">
+      <label for="size">size</label>
+      <input type="number" id="custom-size" value="2" />
+      <select id="select-size">
+        <option value="small">small</option>
+        <option value="middle">middle</option>
+        <option value="big">big</option>
+        <option value="custom">custom</option>
+      </select>
+      <br />
+
+      <label for="color">color</label>
+      <input type="color" id="custom-color" />
+      <select id="select-color">
+        <option value="black">black</option>
+        <option value="lightcoral">lightcoral</option>
+        <option value="lightblue" selected>lightblue</option>
+        <option value="lightgreen">lightgreen</option>
+        <option value="lightyellow">lightyellow</option>
+        <option value="lightsalmon">lightsalmon</option>
+        <option value="lightgray">lightgray</option>
+        <option value="lightpink">lightpink</option>
+        <option value="plum">plum</option>
+        <option value="custom">custom</option>
+      </select>
+      <br />
+
+      <label>fill</label>
+      <input type="color" id="custom-fill-color" />
+      <select id="select-fill-color">
+        <option value="none">none</option>
+        <option value="black">black</option>
+        <option value="lightcoral">lightcoral</option>
+        <option value="lightblue">lightblue</option>
+        <option value="lightgreen">lightgreen</option>
+        <option value="lightyellow">lightyellow</option>
+        <option value="lightsalmon">lightsalmon</option>
+        <option value="lightgray">lightgray</option>
+        <option value="lightpink">lightpink</option>
+        <option value="plum">plum</option>
+        <option value="custom">custom</option>
+      </select>
+      <br />
+
+      <label for="text">text</label>
+      <input type="number" id="text-size" value="14" />
+    </form>
   </div>
+  <div class="svg-container">
+    <svg id="svg"></svg>
+  </div>
+  <div id="images" style="display: none;"></div>
   </div>
 </body>
 

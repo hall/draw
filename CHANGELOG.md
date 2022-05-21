@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- convert settings into a small overlay
+
 ## [0.1.4] - 2022-05-21
 ### Changed
 - inline myscript HTR support
