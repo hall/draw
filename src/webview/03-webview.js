@@ -117,10 +117,7 @@ window.addEventListener('message', event => {
       drawAPI.unstable.custom(message.content);
       break;
     case 'recognize':
-      switch (message.provider) {
-        case 'myscript':
-          myscript(message.token)
-      }
+      window[message.provider](message.token)
       break;
   }
 });

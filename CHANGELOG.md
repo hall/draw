@@ -8,10 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - convert settings into a small overlay
+- integrate mathpix HTR support
 
 ## [0.1.4] - 2022-05-21
 ### Changed
-- inline myscript HTR support
+- integrate myscript HTR support
 - simplify custom buttons interface
 
 ## [0.1.3] - 2022-05-20
