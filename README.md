@@ -40,8 +40,6 @@ To add custom buttons to the toolbar, add an entry to the `draw.buttons` array i
 
 ## Handwritten Text Recognition
 
-Configure HTR with the `Draw: Configure HTR provider` command.
-
 The following services are available to convert hand-written formulas to LaTeX equations.
 
 ### myscript

@@ -6,9 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2022-05-21
 ### Changed
-- convert settings into a small overlay
 - integrate mathpix HTR support
+- convert settings into a small overlay
 
 ## [0.1.4] - 2022-05-21
 ### Changed
