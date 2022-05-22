@@ -31,7 +31,7 @@
 	],
 	"activationEvents": [
 		"onCommand:draw.editCurrentLineAsSVG",
-		"onCommand:draw.configureHDR",
+		"onCommand:draw.configureHTR",
 		"onLanguage:markdown",
 		"onLanguage:asciidoc",
 		"onLanguage:restructuredtext"
@@ -45,8 +45,8 @@
 				"category": "Draw"
 			},
 			{
-				"command": "draw.configureHDR",
-				"title": "Configure HDR provider",
+				"command": "draw.configureHTR",
+				"title": "Configure HTR provider",
 				"category": "Draw"
 			}
 		],
