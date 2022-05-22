@@ -11,7 +11,6 @@ const lineContentInput = document.querySelector('#svg-text');
 
 const drawAPI = {
   unstable: {
-    nonce: () => 'ToBeReplacedByRandomToken',
     /**
      * 
      * @param {String} text text

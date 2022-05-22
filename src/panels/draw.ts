@@ -150,7 +150,7 @@ export class Draw {
         this.inject("./src/webview/htr/myscript.js");
         this.inject("./src/webview/htr/mathpix.js");
 
-        return this.$.root().html()?.replace(/ToBeReplacedByRandomToken/g, this.nonce);
+        return this.$.root().html();
     }
 
     // get text from the editor
