@@ -6,12 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6] - 2022-05-22
 ### Changed
 - convert extension to typescript
 ### Added
 - use [vscode-webview-ui-toolkit](https://github.com/microsoft/vscode-webview-ui-toolkit) library
 - unit test framework and ci job
-
 ### Fixed
 - preserve drawing when app is restarted or panel is moved to the background
 
