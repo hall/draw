@@ -20,6 +20,9 @@ stages:
 
 lint:
   stage: test
+  before_script:
+    - apt update
+    - apt install -y libnss3
   script:
     - npm ci
     - npm run lint
