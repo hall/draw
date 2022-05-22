@@ -1076,7 +1076,7 @@ function initPaint(svgId, conf = null) {
     }
   });
 
-  document.querySelectorAll(".svg-pen > i").forEach(item => {
+  document.querySelectorAll(".svg-pen vscode-button").forEach(item => {
     click(item, e => {
       document.querySelector(".svg-button .active")?.classList.remove("active");
       item.classList.add("active");
@@ -1137,7 +1137,7 @@ function initPaint(svgId, conf = null) {
     config.fontSize = e.target.value;
   });
 
-  document.querySelectorAll(".svg-shape > i").forEach(item => {
+  document.querySelectorAll(".svg-shape vscode-button").forEach(item => {
     click(item, (e) => {
       document.querySelector(".svg-button .active")?.classList.remove("active");
       item.classList.add("active");
@@ -1196,12 +1196,7 @@ function click(selector, callback) {
   if (typeof (selector) == "string") {
     elm = document.querySelector(selector)
   }
-  let div = document.createElement("div")
-  div.style.margin = 0;
-  elm.parentNode.insertBefore(div, elm)
-  div.appendChild(elm)
-
-  div.addEventListener("click", e => callback(e));
+  elm.addEventListener("click", e => callback(e));
 }
 
 // toggle visibility of target when button is clicked

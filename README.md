@@ -36,7 +36,7 @@ To add custom buttons to the toolbar, add an entry to the `draw.buttons` array i
 ]
 ```
 
-> search the [Font Awesome](https://fontawesome.com/v5/search?m=free) set for an icon
+> search the [Font Awesome](https://fontawesome.com/v5/search?m=free) set for an icon name
 
 ## Handwritten Text Recognition
 

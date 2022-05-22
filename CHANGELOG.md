@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- use [vscode-webview-ui-toolkit](https://github.com/microsoft/vscode-webview-ui-toolkit) library
+
 ## [0.1.5] - 2022-05-21
 ### Changed
 - integrate mathpix HTR support

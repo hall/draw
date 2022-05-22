@@ -88,14 +88,16 @@ const drawAPI = {
     custom(content) {
       content.forEach((c) => {
         if (c.type === undefined || c.type === 'script') {
-          let icon = document.createElement("i")
-          icon.classList.add("fa", `fa-${c.icon}`)
-          icon.title = c.title
-          let div = document.createElement("div")
-          div.appendChild(icon)
-          div.onclick = new Function(c.function)
+          let span = document.createElement("span")
+          span.classList.add("fa", `fa-${c.icon}`)
+          span.title = c.title
+          let button = document.createElement("vscode-button")
+          button.setAttribute("appearance", "icon")
+          button.setAttribute("aria-label", c.title)
+          button.appendChild(span)
+          button.onclick = new Function(c.function)
 
-          document.querySelector('div.custom-buttons').appendChild(div)
+          document.querySelector('div.custom-buttons').appendChild(button)
         }
       });
     },

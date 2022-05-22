@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-eval' 'nonce-ToBeReplacedByRandomToken';">
   <title>Draw</title>
-  <script type="text/javascript" nonce="ToBeReplacedByRandomToken"
-    src="https://cdn.jsdelivr.net/npm/iink-js@1.5.4/dist/iink.min.js"></script>
 </head>
 
 <body>
@@ -24,38 +22,69 @@
       <div class="svg-button">
 
         <div class="svg-pen">
-          <i class="fa fa-pencil-alt" data-type="pen" title="pen"></i>
-          <i class="fa fa-eraser" data-type="eraser" title="eraser"></i>
-          <i class="fa fa-font" data-type="text" title="text"></i>
-          <i class="fa fa-pencil-ruler" data-type="select" title="select"></i>
+          <vscode-button appearance="icon" aria-label="pen" data-type="pen">
+            <span class="fa fa-pencil-alt" title="pen"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="eraser" data-type="eraser">
+            <span class="fa fa-eraser" title="eraser"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="text" data-type="text">
+            <span class="fa fa-font" title="text"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="select" data-type="select">
+            <span class="fa fa-pencil-ruler" title="select"></span>
+          </vscode-button>
         </div>
         <span class="svgiconspliter"></span>
         <div class="svg-shape">
-          <i class="fa fa-slash" data-type="line" title="line"></i>
-          <i class="fa fa-draw-polygon" data-type="polygon" title="polygon"></i>
-          <i class="fa fa-square-full" data-type="rect" title="rect"></i>
-          <i class="fa fa-square" data-type="round-rect" title="round-rect"></i>
-          <i class="fa fa-circle" data-type="circle" title="circle"></i>
-          <i class="fa fa-hockey-puck" data-type="ellipse" title="ellipse"></i>
-          <i class="fa fa-layer-group" data-type="diamond" title="diamond"></i>
+          <vscode-button appearance="icon" aria-label="line" data-type="line">
+            <span class="fa fa-slash" title="line"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="polygon" data-type="polygon">
+            <span class="fa fa-draw-polygon" title="polygon"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="rectangle" data-type="rect">
+            <span class="fa fa-square-full" data-type="rect" title="rect"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="round rectangle" data-type="round-rect">
+            <span class="fa fa-square" title="round-rect"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="circle" data-type="circle">
+            <span class="fa fa-circle" title="circle"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="ellipse" data-type="ellipse">
+            <span class="fa fa-hockey-puck" title="ellipse"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="diamond" data-type="diamond">
+            <span class="fa fa-layer-group" title="diamond"></span>
+          </vscode-button>
         </div>
         <span class="svgiconspliter"></span>
         <div class="svg-operate">
-          <i class="fa fa-sliders-h" id="show-settings" title="settings"></i>
-          <i class="fa fa-reply" id="svg-undo" title="undo"></i>
-          <i class="fa fa-share" id="svg-redo" title="redo"></i>
-          <i class="fa fa-trash" id="svg-clean" title="clear board"></i>
+          <vscode-button appearance="icon" aria-label="settings">
+            <span class="fa fa-sliders-h" id="show-settings" title="settings"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="undo">
+            <span class="fa fa-reply" id="svg-undo" title="undo"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="redo">
+            <span class="fa fa-share" id="svg-redo" title="redo"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="clear">
+            <span class="fa fa-trash" id="svg-clean" title="clear"></span>
+          </vscode-button>
         </div>
         <span class="svgiconspliter"></span>
         <div>
-          <i class="fa fa-arrow-down" id="svg-nextline" title="go next line"></i>
-          <i class="fa fa-check-square" id="svg-change-stay" title="change and stay"></i>
-          <i class="fa fa-caret-square-down" id="svg-change-nextline" title="change and go next line"></i>
-          <!--
-            TODO: copy to clipboard currently only works after saving the document;
-            candidate for removal as I'm not sure how useful this is
-          <i class="fa fa-clipboard" id="svg-show-text" title="show svg text"></i>
-           -->
+          <vscode-button appearance="icon" aria-label="go next line">
+            <span class="fa fa-arrow-down" id="svg-nextline" title="go next line"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="change and stay">
+            <span class="fa fa-check-square" id="svg-change-stay" title="change and stay"></span>
+          </vscode-button>
+          <vscode-button appearance="icon" aria-label="change and go to next line">
+            <span class="fa fa-caret-square-down" id="svg-change-nextline" title="change and go next line"></span>
+          </vscode-button>
         </div>
         <span class="svgiconspliter"></span>
         <div class="custom-buttons"></div>
@@ -65,45 +94,45 @@
     <form id="settings" style="display: none;">
       <label for="size">size</label>
       <input type="number" id="custom-size" value="2" />
-      <select id="select-size">
-        <option value="small">small</option>
-        <option value="middle">middle</option>
-        <option value="big">big</option>
-        <option value="custom">custom</option>
-      </select>
+      <vscode-dropdown id="select-size">
+        <vscode-option value="small">small</vscode-option>
+        <vscode-option value="medium">medium</vscode-option>
+        <vscode-option value="large">large</vscode-option>
+        <vscode-option value="large">custom</vscode-option>
+      </vscode-dropdown>
       <br />
 
       <label for="color">color</label>
       <input type="color" id="custom-color" />
-      <select id="select-color">
-        <option value="black">black</option>
-        <option value="lightcoral">lightcoral</option>
-        <option value="lightblue" selected>lightblue</option>
-        <option value="lightgreen">lightgreen</option>
-        <option value="lightyellow">lightyellow</option>
-        <option value="lightsalmon">lightsalmon</option>
-        <option value="lightgray">lightgray</option>
-        <option value="lightpink">lightpink</option>
-        <option value="plum">plum</option>
-        <option value="custom">custom</option>
-      </select>
+      <vscode-dropdown id="select-color">
+        <vscode-option value="black">black</vscode-option>
+        <vscode-option value="lightcoral">lightcoral</vscode-option>
+        <vscode-option value="lightblue" selected>lightblue</vscode-option>
+        <vscode-option value="lightgreen">lightgreen</vscode-option>
+        <vscode-option value="lightyellow">lightyellow</vscode-option>
+        <vscode-option value="lightsalmon">lightsalmon</vscode-option>
+        <vscode-option value="lightgray">lightgray</vscode-option>
+        <vscode-option value="lightpink">lightpink</vscode-option>
+        <vscode-option value="plum">plum</vscode-option>
+        <vscode-option value="custom">custom</vscode-option>
+      </vscode-dropdown>
       <br />
 
       <label>fill</label>
       <input type="color" id="custom-fill-color" />
-      <select id="select-fill-color">
-        <option value="none">none</option>
-        <option value="black">black</option>
-        <option value="lightcoral">lightcoral</option>
-        <option value="lightblue">lightblue</option>
-        <option value="lightgreen">lightgreen</option>
-        <option value="lightyellow">lightyellow</option>
-        <option value="lightsalmon">lightsalmon</option>
-        <option value="lightgray">lightgray</option>
-        <option value="lightpink">lightpink</option>
-        <option value="plum">plum</option>
-        <option value="custom">custom</option>
-      </select>
+      <vscode-dropdown id="select-fill-color">
+        <vscode-option value="none">none</vscode-option>
+        <vscode-option value="black">black</vscode-option>
+        <vscode-option value="lightcoral">lightcoral</vscode-option>
+        <vscode-option value="lightblue">lightblue</vscode-option>
+        <vscode-option value="lightgreen">lightgreen</vscode-option>
+        <vscode-option value="lightyellow">lightyellow</vscode-option>
+        <vscode-option value="lightsalmon">lightsalmon</vscode-option>
+        <vscode-option value="lightgray">lightgray</vscode-option>
+        <vscode-option value="lightpink">lightpink</vscode-option>
+        <vscode-option value="plum">plum</vscode-option>
+        <vscode-option value="custom">custom</vscode-option>
+      </vscode-dropdown>
       <br />
 
       <label for="text">text</label>

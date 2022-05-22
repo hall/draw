@@ -20,7 +20,7 @@ body {
 
 
 .active {
-  color: --vscode-selection-background;
+  color: var(--vscode-focusBorder);
 }
 
 .svg-container {
@@ -49,47 +49,12 @@ body {
   overflow-y: auto;
 }
 
-.svg-button>div {
-  display: inline;
-  list-style: none;
-  margin: 0px;
-  padding: 0px;
-}
-
 .svgiconspliter {
   /* border-left: 1px solid var(--vscode-panel-border);
   border-right: 0 1px solid var(--vscode-panel-border); */
   height: 12px;
   margin: 0 8px;
 }
-
-.svg-button>div div {
-  display: inline-block;
-  margin-right: 10px;
-  font-size: 15px;
-  cursor: default;
-}
-
-.svg-button>div div:hover {
-  /* TODO: css vars not work in hover pseudo class */
-  color: rgba(97, 144, 232, 0.63);
-}
-
-.svg-button>div span {
-  font-size: 13px;
-}
-
-
-/*
- #images {
-  padding-top: 10px;
-  clear: both;
-} 
-
-#images textarea {
-  border: 1.5px solid #6190e8;
-}
-*/
 
 #settings {
   right: 0;
