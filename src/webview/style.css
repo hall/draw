@@ -43,7 +43,7 @@ body {
   height: 35px;
   display: flex;
   align-items: center;
-  padding: 0px 16px;
+  padding: 0px 8px;
   box-sizing: border-box;
   user-select: none;
   overflow-y: auto;
