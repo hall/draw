@@ -168,5 +168,15 @@ document.querySelector('#text-change-nextline').onclick = function () {
     }
     vscode.postMessage({ command: 'requestCurrentLine' })
     vscode.postMessage({ command: 'requestCustom' })
+
+    const state = vscode.getState();
+    if (state && "svg" in state) {
+      svgElement.innerHTML = state["svg"];
+    }
+
+    setInterval(() => {
+      vscode.setState({ svg: svgElement.innerHTML });
+    }, 1000);
+
   }
 }());
