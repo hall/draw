@@ -1,7 +1,7 @@
 if (typeof require !== 'undefined') {
-  var { intersect } = require('./path-int')
+  var { intersect } = require('./path-int');
 } else {
-  var { intersect } = exports
+  var { intersect } = exports;
 }
 
 window.paints = [];
@@ -1172,7 +1172,7 @@ function initPaint(svgId, conf = null) {
   toggle("#show-settings", "#settings");
 
   click("#svg-nextline", e => {
-    document.querySelector('#text-change-nextline')?.onclick()
+    document.querySelector('#text-change-nextline')?.onclick();
   });
 
   (['change-stay', 'change-nextline']).forEach(s => {
@@ -1183,36 +1183,36 @@ function initPaint(svgId, conf = null) {
         `<svg id="svg" xmlns="${svgns}" viewBox="${x - 10} ${y - 10} ${width + 20} ${height + 20}" height="${height + 20}">`);
       document.querySelector("#images").append(textarea);
       window?.drawAPI.unstable.setTextContent(textarea.value + '  ');
-      document.querySelector('#text-' + s)?.onclick()
+      document.querySelector('#text-' + s)?.onclick();
     });
-  })
+  });
 
   return { reInit };
 }
 
 // wrap icon in div to allow binding an onclick events
 function click(selector, callback) {
-  let elm = selector
+  let elm = selector;
   if (typeof (selector) == "string") {
-    elm = document.querySelector(selector)
+    elm = document.querySelector(selector);
   }
   elm.addEventListener("click", e => callback(e));
 }
 
 // toggle visibility of target when button is clicked
 function toggle(buttonSel, targetSel) {
-  button = document.querySelector(buttonSel)
+  button = document.querySelector(buttonSel);
   target = document.querySelector(targetSel);
   click(buttonSel, () => {
     if (target.style.display === 'none') {
-      target.style.display = ''
+      target.style.display = '';
       button.classList.add("active");
     } else {
-      target.style.display = 'none'
+      target.style.display = 'none';
       button.classList.remove("active");
     }
-  })
+  });
 
 }
 
-exports.initPaint = initPaint
+exports.initPaint = initPaint;

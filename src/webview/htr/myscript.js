@@ -1,7 +1,7 @@
 function myscript(token) {
 
     var getStrokeGroups = () => {
-        let strokes = []
+        let strokes = [];
         for (const item of svg.children) {
             if (item.nodeName === 'path') {
                 let points = item
@@ -13,12 +13,12 @@ function myscript(token) {
                             x: parseFloat(item.split(",")[0]),
                             y: parseFloat(item.split(",")[1])
                         };
-                    })
-                strokes.push({ x: points.map(v => v.x), y: points.map(v => v.y) })
+                    });
+                strokes.push({ x: points.map(v => v.x), y: points.map(v => v.y) });
             }
         }
-        return [{ "penStyle": null, "strokes": strokes }]
-    }
+        return [{ "penStyle": null, "strokes": strokes }];
+    };
 
     const iinkRecognizer = iink.DefaultBehaviors.recognizerList.find(x => {
         const infos = x.getInfo();
@@ -28,7 +28,7 @@ function myscript(token) {
     // Create a empty model
     const model = iink.InkModel.createModel();
     // Filling the model with the stroke groups
-    model.strokeGroups = getStrokeGroups()
+    model.strokeGroups = getStrokeGroups();
 
     // Creating a recognizer context with the configuration attached
     const recognizerContext = iink.RecognizerContext.createEmptyRecognizerContext({
@@ -52,7 +52,7 @@ function myscript(token) {
                 ],
             }
         }
-    }
+    };
 
     // Assigning a theme to the document
     recognizerContext.editor.theme = iink.DefaultTheme;
@@ -63,13 +63,13 @@ function myscript(token) {
             Object.entries(x.exports)
                 .forEach(([mimeType, exportValue]) => {
 
-                    let latex = x.exports[mimeType]
-                    let content = '$$' + latex.trim() + '$$ ' + ' '
-                    drawAPI.unstable.setTextContent('')
+                    let latex = x.exports[mimeType];
+                    let content = '$$' + latex.trim() + '$$ ' + ' ';
+                    drawAPI.unstable.setTextContent('');
                     drawAPI.unstable.editCurrentLine({
                         control: 0,
                         text: content
-                    })
+                    });
                 });
         }
     };
