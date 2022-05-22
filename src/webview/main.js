@@ -1,5 +1,5 @@
 if (typeof require !== 'undefined') {
-  var { intersect } = require('./01-path-int')
+  var { intersect } = require('./path-int')
 } else {
   var { intersect } = exports
 }

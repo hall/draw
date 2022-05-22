@@ -282,9 +282,9 @@ function getWebviewContent(context: vscode.ExtensionContext, currentPanel: vscod
   inject("./src/webview/Font-Awesome-5-8-2-all-min.css")
   inject("./node_modules/@vscode/webview-ui-toolkit/dist/toolkit.js")
   inject("./node_modules/iink-js/dist/iink.min.js")
-  inject("./src/webview/01-path-int.js")
-  inject("./src/webview/02-main.js")
-  inject("./src/webview/03-webview.js")
+  inject("./src/webview/path-int.js")
+  inject("./src/webview/main.js")
+  inject("./src/webview/webview.js")
   inject("./src/webview/htr/myscript.js")
   inject("./src/webview/htr/mathpix.js")
 
