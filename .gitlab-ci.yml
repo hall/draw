@@ -20,14 +20,18 @@ stages:
 
 lint:
   stage: test
-  before_script:
-    - apt update
-    - apt install -y libnss3
   script:
     - npm ci
     - npm run lint
+
+test:
+  stage: test
+  before_script:
+    - apt update
+    - apt install -y libnss3 libatk
+  script:
+    - npm ci
     - npm run test
-    # - cd src/webview && npm ci && cd ../.. # webview dependencies
 
 .package:
   stage: package
