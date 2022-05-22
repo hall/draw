@@ -6,6 +6,16 @@ if (typeof require !== 'undefined') {
 
 window.paints = [];
 
+// convent a css color name to its hex value
+function getHexColor(str) {
+  var canvas = document.createElement('canvas');
+  let ctx = canvas.getContext('2d');
+  ctx.fillStyle = str;
+  let hex = ctx.fillStyle;
+  canvas.remove();
+  return hex
+}
+
 function rect2path(x, y, width, height, rx, ry) {
   x = parseFloat(x);
   y = parseFloat(y);
@@ -1085,32 +1095,34 @@ function initPaint(svgId, conf = null) {
   });
 
   document.querySelector("#select-color").addEventListener("change", e => {
-    config.color =
-      e.target.value === "custom"
-        ? document.querySelector("#custom-color").value
-        : e.target.value;
+    let custom = document.querySelector("#custom-color")
+    config.color = e.target.value === "custom" ? custom.value : e.target.value;
+    custom.value = getHexColor(e.target.value);
   });
 
-  document.querySelector("#custom-color").addEventListener("change", e => {
-    if (document.querySelector("#select-color").value === "custom") {
-      config.color = e.target.value;
-    }
+  document.querySelector("#custom-color").addEventListener("input", e => {
+    document.querySelector("#select-color").value = "custom"
+    config.color = e.target.value;
   });
 
   document.querySelector("#select-size").addEventListener("change", e => {
+    let custom = document.querySelector("#custom-size")
     switch (e.target.value) {
       case "custom":
-        config.lineWidth = document.querySelector("#custom-size").value;
+        config.lineWidth = custom.value;
         break;
       case "small":
         config.lineWidth = 2;
         break;
-      case "middle":
+      case "medium":
         config.lineWidth = 4;
         break;
-      case "big":
-        config.lineWidth = 6;
+      case "large":
+        config.lineWidth = 8;
         break;
+    }
+    if (e.target.value !== "custom") {
+      custom.value = config.lineWidth;
     }
   });
 
@@ -1121,16 +1133,14 @@ function initPaint(svgId, conf = null) {
   });
 
   document.querySelector("#select-fill-color").addEventListener("change", e => {
-    config.fillColor =
-      e.target.value === "custom"
-        ? document.querySelector("#custom-fill-color").value
-        : e.target.value;
+    let custom = document.querySelector("#custom-fill-color");
+    config.fillColor = e.target.value === "custom" ? custom.value : e.target.value;
+    custom.value = getHexColor(e.target.value);
   });
 
-  document.querySelector("#custom-fill-color").addEventListener("change", e => {
-    if (document.querySelector("#select-fill-color").value === "custom") {
-      config.fillColor = e.target.value;
-    }
+  document.querySelector("#custom-fill-color").addEventListener("input", e => {
+    document.querySelector("#select-fill-color").value = "custom";
+    config.fillColor = e.target.value;
   });
 
   document.querySelector("#text-size").addEventListener("change", e => {
