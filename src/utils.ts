@@ -1,12 +1,12 @@
-const fs = require("fs");
-const path = require("path");
-const vscode = require("vscode");
+import fs = require("fs");
+import path = require("path");
+import vscode = require("vscode");
 
 let settings = vscode.workspace.getConfiguration('draw');
-exports.settings = settings
+export { settings };
 
 // generate a nonce
-exports.nonce = function () {
+export function nonce() {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     for (let i = 0; i < 32; i++) {
@@ -15,16 +15,14 @@ exports.nonce = function () {
     return text;
 }
 
-// swap elements a and b
-Array.prototype.swap = function (a, b) {
-    this[a] = this.splice(b, 1, this[a])[0]
-    return this
-}
-
-
 // write text to filename
-exports.write = function (text, filename) {
-    let dir = path.join(vscode.workspace.rootPath, settings.directory || "")
+export function write(text: string, filename: string) {
+    let root = ""
+    if (vscode.workspace.workspaceFolders) {
+        root = vscode.workspace.workspaceFolders[0].uri.fsPath
+    }
+
+    let dir = path.join(root, settings.directory || "")
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 
     fs.writeFileSync(path.join(dir, filename), text, { encoding: 'utf8' });

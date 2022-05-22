@@ -1,6 +1,6 @@
 
 // return language formatted link to filename; optionally, with alt text
-exports.createLink = function (language, filename, alt) {
+export function createLink(language: string, filename: string, alt: string) {
     // https://hyperpolyglot.org/lightweight-markup
     switch (language) {
 
@@ -23,7 +23,7 @@ exports.createLink = function (language, filename, alt) {
 }
 
 // return alt text and filename (in that order) from link in language format
-exports.readLink = function (language, link) {
+export function readLink(language: string, link: string) {
     // https://hyperpolyglot.org/lightweight-markup
     let match;
     switch (language) {
@@ -34,7 +34,7 @@ exports.readLink = function (language, link) {
 
         case 'asciidoc':
             match = link.match(/image::(.*)\[(.*)\]/)
-            if (match) match.swap(1, 2)
+            if (match) [match[1], match[2]] = [match[2], match[1]];
             break
 
         case 'restructuredtext':

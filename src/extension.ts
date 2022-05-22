@@ -1,51 +1,27 @@
-const vscode = require("vscode");
-const path = require("path");
-const fs = require("fs");
-const { v4: uuidv4 } = require('uuid');
-const cheerio = require("cheerio");
-var Walk = require("@root/walk");
+import vscode = require("vscode");
+import path = require("path");
+import fs = require("fs");
+import { v4 as uuidv4 } from "uuid";
+import cheerio = require("cheerio");
 
-const htr = require("./htr.js");
-const utils = require("./utils.js");
-const langs = require("./langs.js");
+import htr = require("./htr");
+import utils = require("./utils");
+import langs = require("./langs");
 
-// load root webview document
-var $ = cheerio.load(fs.readFileSync(path.join(__dirname, 'webview.html'), { encoding: 'utf8' }))
-
+var $: any
 const nonce = utils.nonce()
-$("head").append(`<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-eval' 'nonce-${nonce}';">`)
-
-// inject js/css into base html document
-function loadWebviewFiles(err, pathname, dirent) {
-  if (dirent.isDirectory()) return Promise.resolve();
-
-  let content = fs.readFileSync(pathname)
-  switch (path.extname(pathname).substring(1)) {
-    case 'css':
-      $("head").append(`<style>${content}</style>`)
-      break;
-    case 'js':
-      $("body").append(`<script nonce="${nonce}">${content}</script>`)
-      break;
-  }
-  return Promise.resolve();
-}
-
-Walk.walk(path.join(__dirname, "webview"), loadWebviewFiles).then(function () { });
 
 /** @param {vscode.ExtensionContext} context */
-exports.activate = function (context) {
+export function activate(context: vscode.ExtensionContext) {
 
   // values for webview status
-  /** @type {vscode.WebviewPanel | undefined} */
-  let currentPanel = undefined;
+  let currentPanel: vscode.WebviewPanel | undefined = undefined;
 
   // values for editing status
-  /** @type {vscode.TextEditor | undefined} */
-  let currentEditor = undefined;
-  let currentLine = 0;
-  let currentText = "";
-  let updateHandle = undefined;
+  let currentEditor: vscode.TextEditor | undefined = undefined;
+  let currentLine: number | undefined = 0;
+  let currentText: string | undefined = "";
+  let updateHandle: any = undefined;
 
   function createNewPanel() {
     // Create and show panel
@@ -55,8 +31,14 @@ exports.activate = function (context) {
       vscode.ViewColumn.Three,
       getWebviewOptions(context.extensionUri)
     );
+    let html = currentPanel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, 'src', 'webview', 'index.html'))
+    // load root webview document
+    $ = cheerio.load(fs.readFileSync(html.path, { encoding: 'utf8' }))
 
-    currentPanel.webview.html = getWebviewContent(context, currentPanel)
+    $("head").append(`<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-eval' 'nonce-${nonce}';">`)
+
+
+    currentPanel.webview.html = getWebviewContent(context, currentPanel) || ""
 
     // Handle messages from the webview
     currentPanel.webview.onDidReceiveMessage(
@@ -76,11 +58,12 @@ exports.activate = function (context) {
             return;
           case 'recognize':
             context.secrets.get("token").then((token) => {
-              currentPanel.webview.postMessage({
-                command: 'recognize',
-                token: token,
-                provider: message.provider
-              });
+              if (currentPanel)
+                currentPanel.webview.postMessage({
+                  command: 'recognize',
+                  token: token,
+                  provider: message.provider
+                });
             })
             return;
         }
@@ -104,7 +87,7 @@ exports.activate = function (context) {
     );
   }
 
-  function getEditorText(show) {
+  function getEditorText(show: boolean) {
     let currentEditor_ = currentEditor
     let currentLine_ = currentLine
     let activeTextEditor = vscode.window.activeTextEditor;
@@ -132,7 +115,7 @@ exports.activate = function (context) {
   }
 
   let updateCheckStrings = ['', '']
-  function resetCheckStrings(str) {
+  function resetCheckStrings(str: string) {
     updateCheckStrings[0] = updateCheckStrings[1] = str
   }
 
@@ -149,8 +132,11 @@ exports.activate = function (context) {
         currentEditor = currentEditor_
         currentLine = currentLine_
         if (utils.settings.directory) {
-          let link = langs.readLink(currentEditor.document.languageId, text)
-          if (link) text = fs.readFileSync(path.join(vscode.workspace.rootPath, link), { encoding: 'utf-8' })
+          let link;
+          if (currentEditor)
+            link = langs.readLink(currentEditor.document.languageId, text)
+          if (vscode.workspace.workspaceFolders)
+            if (link) text = fs.readFileSync(path.join(vscode.workspace.workspaceFolders[0].uri.path, link), { encoding: 'utf-8' })
         }
         if (topush) {
           currentPanel.webview.postMessage({ command: 'currentLine', content: text });
@@ -160,19 +146,29 @@ exports.activate = function (context) {
   }
 
 
-  function setEditorText(text, control) {
+  function setEditorText(text: string, control: number) {
     if (utils.settings.directory && !text.startsWith("$$")) {
       let filename = `${uuidv4()}.svg`
       let alt = "";
 
       // reuse existing alt and filename, if available
-      if (match = currentText.match(/!\[(.*)\]\((.*\.svg)\)/)) {
+      let match;
+      if (currentText)
+        match = currentText.match(/!\[(.*)\]\((.*\.svg)\)/)
+      if (match) {
         alt = match[1]
         filename = match[2].replace(/^.*[\\\/]/, '')
       }
 
-      let name = utils.write(text, filename)
-      text = langs.createLink(currentEditor.document.languageId, name, alt)
+      if (currentEditor) {
+
+        let name
+        if (text)
+          name = utils.write(text, filename)
+        if (name)
+          text = langs.createLink(currentEditor.document.languageId, name, alt) || ""
+
+      }
     }
 
     if (!currentEditor || currentEditor.document.isClosed) {
@@ -180,20 +176,25 @@ exports.activate = function (context) {
       return;
     }
 
-    let p = vscode.window.showTextDocument(currentEditor.document, {
-      viewColumn: currentEditor.viewColumn,
-      selection: new vscode.Range(currentLine, 0, currentLine, 0)
-    }).then((editor) => editor.edit(edit => {
-      edit.replace(new vscode.Range(currentLine, 0, currentLine + 1, 0), text + '\n');
-      resetCheckStrings(text.split('\n')[0] + '\n')
-    }))
+    let p;
+    if (currentLine) {
+      p = vscode.window.showTextDocument(currentEditor.document, {
+        viewColumn: currentEditor.viewColumn,
+        selection: new vscode.Range(currentLine, 0, currentLine, 0)
+      }).then((editor) => editor.edit(edit => {
+        if (currentLine)
+          edit.replace(new vscode.Range(currentLine, 0, currentLine + 1, 0), text + '\n');
+        resetCheckStrings(text.split('\n')[0] + '\n')
+      }))
+    }
 
-    if (control !== 0) {
+    if (control !== 0 && p) {
       p = p.then(() => {
-        vscode.window.showTextDocument(currentEditor.document, {
-          viewColumn: currentEditor.viewColumn,
-          selection: new vscode.Range(currentLine + control, 0, currentLine + control, 0)
-        })
+        if (currentEditor && currentLine)
+          vscode.window.showTextDocument(currentEditor.document, {
+            viewColumn: currentEditor.viewColumn,
+            selection: new vscode.Range(currentLine + control, 0, currentLine + control, 0)
+          })
       }).then(() => {
         pushCurrentLine()
       })
@@ -211,7 +212,7 @@ exports.activate = function (context) {
         }].concat(buttons)
       }
 
-      currentPanel.webview.postMessage({
+      currentPanel?.webview.postMessage({
         command: 'customButtons',
         content: buttons
       });
@@ -231,14 +232,26 @@ exports.activate = function (context) {
       }
     }),
     vscode.commands.registerCommand('draw.configureHTR', () => {
-      htr.init(context, currentPanel);
+      htr.init(context);
     })
   );
 
+  if (vscode.window.registerWebviewPanelSerializer) {
+    vscode.window.registerWebviewPanelSerializer('drawPanel', {
+      async deserializeWebviewPanel(webviewPanel, state) {
+        console.log(`Got state: ${state}`);
+        // CatCodingPanel.revive(webviewPanel, context.extensionUri);
+        webviewPanel.webview.options = getWebviewOptions(context.extensionUri);
+        createNewPanel();
+        pushCurrentLine()
+        // webviewPanel.webview.html = 
+      }
+    });
+  }
 
 }
 
-function getWebviewOptions(extensionUri) {
+function getWebviewOptions(extensionUri: vscode.Uri) {
   return {
     enableScripts: true,
     // TODO: more secure and required for restore over extension updates
@@ -247,15 +260,33 @@ function getWebviewOptions(extensionUri) {
 }
 
 
-function getWebviewContent(context, currentPanel) {
+function getWebviewContent(context: vscode.ExtensionContext, currentPanel: vscode.WebviewPanel) {
   // append script at path to the document body
-  function inject(filepath) {
+  function inject(filepath: string) {
     const toolkitUri = currentPanel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, ...[filepath]))
-    $("body").append(`<script type="module" nonce="${nonce}" src="${toolkitUri}"></script>`)
+    switch (path.extname(filepath).substring(1)) {
+      case 'css':
+        $("head").append(`<link rel="stylesheet" nonce="${nonce}" href="${toolkitUri}">`);
+        break;
+      case 'js':
+        let attr = "";
+        if (filepath.includes("node_modules")) {
+          attr = `type="module"`
+        }
+        $("body").append(`<script ${attr} nonce="${nonce}" src="${toolkitUri}"></script>`)
+        break;
+    }
   }
 
+  inject("./src/webview/style.css")
+  inject("./src/webview/Font-Awesome-5-8-2-all-min.css")
   inject("./node_modules/@vscode/webview-ui-toolkit/dist/toolkit.js")
   inject("./node_modules/iink-js/dist/iink.min.js")
+  inject("./src/webview/01-path-int.js")
+  inject("./src/webview/02-main.js")
+  inject("./src/webview/03-webview.js")
+  inject("./src/webview/htr/myscript.js")
+  inject("./src/webview/htr/mathpix.js")
 
-  return $.root().html().replace(/ToBeReplacedByRandomToken/g, nonce)
+  return $.root().html()?.replace(/ToBeReplacedByRandomToken/g, nonce)
 }
