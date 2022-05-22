@@ -12,7 +12,8 @@ const langs = require("./langs.js");
 // load root webview document
 var $ = cheerio.load(fs.readFileSync(path.join(__dirname, 'webview.html'), { encoding: 'utf8' }))
 
-let settings = vscode.workspace.getConfiguration('draw');
+const nonce = utils.nonce()
+$("head").append(`<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-eval' 'nonce-${nonce}';">`)
 
 // inject js/css into base html document
 function loadWebviewFiles(err, pathname, dirent) {
@@ -21,10 +22,10 @@ function loadWebviewFiles(err, pathname, dirent) {
   let content = fs.readFileSync(pathname)
   switch (path.extname(pathname).substring(1)) {
     case 'css':
-      $("head").append('<style>' + content + '</style>')
+      $("head").append(`<style>${content}</style>`)
       break;
     case 'js':
-      $("body").append('<script nonce="ToBeReplacedByRandomToken">' + content + '</script>')
+      $("body").append(`<script nonce="${nonce}">${content}</script>`)
       break;
   }
   return Promise.resolve();
@@ -52,23 +53,11 @@ exports.activate = function (context) {
       'drawNote',
       'Draw',
       vscode.ViewColumn.Three,
-      {
-        // Enable scripts in the webview
-        enableScripts: true
-      }
+      getWebviewOptions(context.extensionUri)
     );
-    const nonce = utils.nonce()
 
-    // append script at path to the document body
-    function inject(path) {
-      const toolkitUri = currentPanel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, ...[path]))
-      $("body").append(`<script type="module" nonce="${nonce}" src="${toolkitUri}"></script>`)
-    }
+    currentPanel.webview.html = getWebviewContent(context, currentPanel)
 
-    inject("./node_modules/@vscode/webview-ui-toolkit/dist/toolkit.js")
-    inject("./node_modules/iink-js/dist/iink.min.js")
-
-    currentPanel.webview.html = $.root().html().replace(/ToBeReplacedByRandomToken/g, nonce)
     // Handle messages from the webview
     currentPanel.webview.onDidReceiveMessage(
       message => {
@@ -146,6 +135,7 @@ exports.activate = function (context) {
   function resetCheckStrings(str) {
     updateCheckStrings[0] = updateCheckStrings[1] = str
   }
+
   function realTimeCurrentEditorUpdate() {
     updateHandle = setInterval(() => {
       let { text, currentEditor_, currentLine_ } = getEditorText(false)
@@ -158,7 +148,7 @@ exports.activate = function (context) {
         updateCheckStrings[0] = text
         currentEditor = currentEditor_
         currentLine = currentLine_
-        if (settings.directory) {
+        if (utils.settings.directory) {
           let link = langs.readLink(currentEditor.document.languageId, text)
           if (link) text = fs.readFileSync(path.join(vscode.workspace.rootPath, link), { encoding: 'utf-8' })
         }
@@ -171,7 +161,7 @@ exports.activate = function (context) {
 
 
   function setEditorText(text, control) {
-    if (settings.directory && !text.startsWith("$$")) {
+    if (utils.settings.directory && !text.startsWith("$$")) {
       let filename = `${uuidv4()}.svg`
       let alt = "";
 
@@ -181,8 +171,7 @@ exports.activate = function (context) {
         filename = match[2].replace(/^.*[\\\/]/, '')
       }
 
-      utils.write(text, filename)
-      let name = path.join(settings.directory, filename)
+      let name = utils.write(text, filename)
       text = langs.createLink(currentEditor.document.languageId, name, alt)
     }
 
@@ -212,7 +201,7 @@ exports.activate = function (context) {
   }
 
   function pushCustom() {
-    let buttons = settings['buttons']
+    let buttons = utils.settings['buttons']
     context.secrets.get("provider").then((provider) => {
       if (provider) {
         buttons = [{
@@ -246,4 +235,27 @@ exports.activate = function (context) {
     })
   );
 
+
+}
+
+function getWebviewOptions(extensionUri) {
+  return {
+    enableScripts: true,
+    // TODO: more secure and required for restore over extension updates
+    // localResourceRoots: ['webview', 'node_modules'].map((i) => { vscode.Uri.joinPath(extensionUri, i) })
+  };
+}
+
+
+function getWebviewContent(context, currentPanel) {
+  // append script at path to the document body
+  function inject(filepath) {
+    const toolkitUri = currentPanel.webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, ...[filepath]))
+    $("body").append(`<script type="module" nonce="${nonce}" src="${toolkitUri}"></script>`)
+  }
+
+  inject("./node_modules/@vscode/webview-ui-toolkit/dist/toolkit.js")
+  inject("./node_modules/iink-js/dist/iink.min.js")
+
+  return $.root().html().replace(/ToBeReplacedByRandomToken/g, nonce)
 }
