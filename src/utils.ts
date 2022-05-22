@@ -2,7 +2,7 @@ import fs = require("fs");
 import path = require("path");
 import vscode = require("vscode");
 
-let settings = vscode.workspace.getConfiguration('draw');
+const settings = vscode.workspace.getConfiguration('draw');
 export { settings };
 
 // generate a nonce
@@ -17,16 +17,16 @@ export function nonce() {
 
 // write text to filename
 export function write(text: string, filename: string) {
-    let root = ""
+    let root = "";
     if (vscode.workspace.workspaceFolders) {
-        root = vscode.workspace.workspaceFolders[0].uri.fsPath
+        root = vscode.workspace.workspaceFolders[0].uri.fsPath;
     }
 
-    let dir = path.join(root, settings.directory || "")
+    const dir = path.join(root, settings.directory || "");
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 
     fs.writeFileSync(path.join(dir, filename), text, { encoding: 'utf8' });
 
     // relative path
-    return path.join(settings.directory || "", filename)
+    return path.join(settings.directory || "", filename);
 }

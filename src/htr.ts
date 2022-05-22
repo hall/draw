@@ -20,10 +20,9 @@ export function init(context: vscode.ExtensionContext) {
     ).then((provider: vscode.QuickPickItem | undefined) => {
         if (provider && provider.label === "none") {
             context.secrets.delete("provider").then(() => {
-                context.secrets.delete("token").then(() => {
-                })
-            })
-            return
+                context.secrets.delete("token").then();
+            });
+            return;
         }
         if (provider)
             context.secrets.store("provider", provider.label).then(() => {
@@ -41,7 +40,7 @@ export function init(context: vscode.ExtensionContext) {
                                     placeHolder: "hmac key",
                                     validate: isUUID
                                 }
-                            ])
+                            ]);
                             break;
 
                         case 'mathpix':
@@ -56,17 +55,17 @@ export function init(context: vscode.ExtensionContext) {
                                     placeHolder: "app key",
                                     validate: () => true
                                 }
-                            ])
-                            break
+                            ]);
+                            break;
                     }
 
-            })
+            });
 
-    })
+    });
 }
 
 function isUUID(string: string) {
-    return !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string)
+    return !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string);
 }
 
 // prompt user in context for list of items
@@ -80,7 +79,7 @@ function isUUID(string: string) {
 */
 function prompt(context: vscode.ExtensionContext, items: any) {
     context.secrets.get("token").then((token: any) => {
-        if (!token) token = {}
+        if (!token) token = {};
 
         for (let i = 0, p = Promise.resolve(); i < items.length; i++) {
             p = p.then(() => {
@@ -92,8 +91,8 @@ function prompt(context: vscode.ExtensionContext, items: any) {
                     // save here in case of partial completion
                     token[items[i].key] = value;
                     return context.secrets.store("token", token);
-                })
-            })
+                });
+            });
         }
-    })
+    });
 }
