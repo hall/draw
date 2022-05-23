@@ -69,23 +69,20 @@ package:release:
 
 bump:
   stage: publish
-  only:
-    - $CI_DEFAULT_BRANCH
+  rules:
+    - changes:
+        - CHANGELOG.md
+      if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   except:
     - tags
   script:
-    - | # if version was bumped in package.json, push a new tag
+    - | # if version was bumped in CHANGELOG, bump package.json, and push a new tag
       LATEST=$(git show $CI_DEFAULT_BRANCH:package.json | jq -r '.version')
-      CURRENT=$(jq -r '.version' package.json)
-
-      if ! grep "\[$CURRENT\]" CHANGELOG.md; then
-        echo ERROR: no entry in CHANGELOG.md for version "$CURRENT"
-        exit 1
-      fi
+      CURRENT=$(perl -lne 'print for /## \[(\d\.\d\.\d)\] /' CHANGELOG.md | head -1)
 
       if [[ "$CURRENT" != "$LATEST" ]]; then
-        git tag "$CURRENT"
-        git push origin "$CURRENT"
+        npm version "$CURRENT"
+        git push --atomic origin "$CI_COMMIT_BRANCH" "$CURRENT"
       fi
 
 publish:
