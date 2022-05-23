@@ -122,16 +122,16 @@ export class Draw {
         Draw.currentPanel = new Draw(panel, context);
     }
 
-    private inject(filepath: string) {
-        const absPath = path.join(this._extensionUri.fsPath, filepath);
+    private inject(...filepath: string[]) {
+        const absPath = path.join(this._extensionUri.fsPath, ...filepath);
         if (fs.lstatSync(absPath).isDirectory()) {
-            [...fs.readdirSync(absPath)].sort().forEach(p => this.inject(path.join(filepath, p)));
+            [...fs.readdirSync(absPath)].sort().forEach(p => this.inject(path.join(...filepath, p)));
             return;
         }
 
-        const toolkitUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...[filepath]));
+        const toolkitUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...filepath));
         let attr = "";
-        switch (path.extname(filepath).substring(1)) {
+        switch (path.extname(path.join(...filepath)).substring(1)) {
             case 'css':
                 this.$("head").append(`<link rel="stylesheet" nonce="${this.nonce}" href="${toolkitUri}">`);
                 break;
@@ -145,9 +145,9 @@ export class Draw {
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
-        this.inject("./node_modules/@vscode/webview-ui-toolkit/dist/toolkit.js");
-        this.inject("./node_modules/iink-js/dist/iink.min.js");
-        this.inject("./src/webview");
+        this.inject("node_modules", "@vscode", "webview-ui-toolkit", "dist", "toolkit.js");
+        this.inject("node_modules", "iink-js", "dist", "iink.min.js");
+        this.inject("src", "webview");
 
         return this.$.root().html();
     }

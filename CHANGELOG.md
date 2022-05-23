@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8] - 2022-05-23
+### Fixed
+- remove hardcoded unix-style paths
 
 ## [0.1.7] - 2022-05-23
 ### Fixed
