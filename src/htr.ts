@@ -31,14 +31,14 @@ export function init(context: vscode.ExtensionContext) {
                         case 'myscript':
                             prompt(context, [
                                 {
-                                    key: "app",
+                                    title: "app",
                                     placeHolder: "application token",
-                                    validate: isUUID
+                                    validateInput: isUUID
                                 },
                                 {
-                                    key: "hmac",
+                                    title: "hmac",
                                     placeHolder: "hmac key",
-                                    validate: isUUID
+                                    validateInput: isUUID
                                 }
                             ]);
                             break;
@@ -46,14 +46,14 @@ export function init(context: vscode.ExtensionContext) {
                         case 'mathpix':
                             prompt(context, [
                                 {
-                                    key: "id",
+                                    title: "id",
                                     placeHolder: "app id",
-                                    validate: () => true
+                                    validateInput: () => null
                                 },
                                 {
-                                    key: "key",
+                                    title: "key",
                                     placeHolder: "app key",
-                                    validate: () => true
+                                    validateInput: () => null
                                 }
                             ]);
                             break;
@@ -64,32 +64,30 @@ export function init(context: vscode.ExtensionContext) {
     });
 }
 
-function isUUID(string: string) {
-    return !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string);
+function isUUID(string: string): string {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string)) {
+        return "value must be a valid UUID"
+    }
+    return ""
 }
 
 // prompt user in context for list of items
 // save responses under the "token" secret store key
-/*
-  item = {
-      key: "name",
-      placeHolder: "placeholder text",
-      validate: () => console.log("validation function")
-  }
-*/
-function prompt(context: vscode.ExtensionContext, items: any) {
+function prompt(context: vscode.ExtensionContext, items: vscode.InputBoxOptions[]) {
     context.secrets.get("token").then((token: any) => {
         if (!token) token = {};
 
         for (let i = 0, p = Promise.resolve(); i < items.length; i++) {
             p = p.then(() => {
+                const v = items[i].title;
                 return vscode.window.showInputBox({
                     placeHolder: items[i].placeHolder,
-                    value: token[items[i].key] || null,
-                    validateInput: text => items[i].validate(text)
+                    value: v ? token[v] : null,
+                    password: true,
+                    validateInput: items[i].validateInput
                 }).then((value) => {
                     // save here in case of partial completion
-                    token[items[i].key] = value;
+                    if (v) token[v] = value;
                     return context.secrets.store("token", token);
                 });
             });
