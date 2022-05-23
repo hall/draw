@@ -53,19 +53,40 @@ test:
     paths:
       - "*.vsix"
 
-package_release:
+package:test:
+  extends: .package
+  artifacts:
+    expire_in: 10 days
+  except:
+    - tags
+
+package:release:
   extends: .package
   artifacts:
     expire_in: 1 year
   only:
     - tags
 
-package_test:
-  extends: .package
-  artifacts:
-    expire_in: 10 days
+bump:
+  stage: publish
+  only:
+    - $CI_DEFAULT_BRANCH
   except:
     - tags
+  script:
+    - | # if version was bumped in package.json, push a new tag
+      LATEST=$(git show $CI_DEFAULT_BRANCH:package.json | jq -r '.version')
+      CURRENT=$(jq -r '.version' package.json)
+
+      if ! grep "\[$CURRENT\]" CHANGELOG.md; then
+        echo ERROR: no entry in CHANGELOG.md for version "$CURRENT"
+        exit 1
+      fi
+
+      if [[ "$CURRENT" != "$LATEST" ]]; then
+        git tag "$CURRENT"
+        git push origin "$CURRENT"
+      fi
 
 publish:
   stage: publish
@@ -73,7 +94,6 @@ publish:
     - npm ci
     - npx ovsx publish *.vsix -p $OPENVSX_ACCESS_TOKEN
     - npx vsce publish --packagePath *.vsix -p $AZURE_ACCESS_TOKEN
-  when: manual
   only:
     - tags
 
