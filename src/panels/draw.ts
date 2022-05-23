@@ -291,10 +291,9 @@ export class Draw {
 
 }
 
-export function getWebviewOptions(extensionUri: vscode.Uri) {
+export function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
         enableScripts: true,
-        // TODO: more secure and required for restore over extension updates
-        // localResourceRoots: ['webview', 'node_modules'].map((i) => { vscode.Uri.joinPath(extensionUri, i) })
+        localResourceRoots: ['src/webview', 'node_modules'].map((i) => vscode.Uri.joinPath(extensionUri, i))
     };
 }
