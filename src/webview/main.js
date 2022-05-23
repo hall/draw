@@ -1,3 +1,4 @@
+if (typeof exports === 'undefined') exports = {};
 if (typeof require !== 'undefined') {
   var { intersect } = require('./path-int');
 } else {
@@ -65,7 +66,7 @@ function polygon2path(points) {
   return `M ${pointsList[0]} L ${pointsList.splice(1).join(" ")} Z`;
 }
 
-function initPaint(svgId, conf = null) {
+exports.initPaint = function (svgId, conf = null) {
   if (window.paints[svgId]) {
     return;
   } else {
@@ -1225,4 +1226,3 @@ function toggle(buttonSel, targetSel) {
 
 }
 
-exports.initPaint = initPaint;

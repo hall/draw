@@ -123,6 +123,11 @@ export class Draw {
     }
 
     private inject(filepath: string) {
+        if (fs.lstatSync(filepath).isDirectory()) {
+            [...fs.readdirSync(filepath)].sort().forEach(p => this.inject(path.join(filepath, p)))
+            return
+        }
+
         const toolkitUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...[filepath]));
         let attr = "";
         switch (path.extname(filepath).substring(1)) {
@@ -139,16 +144,9 @@ export class Draw {
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
-        // append script at path to the document body
-        this.inject("./src/webview/style.css");
-        this.inject("./src/webview/Font-Awesome-5-8-2-all-min.css");
         this.inject("./node_modules/@vscode/webview-ui-toolkit/dist/toolkit.js");
         this.inject("./node_modules/iink-js/dist/iink.min.js");
-        this.inject("./src/webview/path-int.js");
-        this.inject("./src/webview/main.js");
-        this.inject("./src/webview/webview.js");
-        this.inject("./src/webview/htr/myscript.js");
-        this.inject("./src/webview/htr/mathpix.js");
+        this.inject("./src/webview")
 
         return this.$.root().html();
     }

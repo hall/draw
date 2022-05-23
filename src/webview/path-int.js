@@ -1,4 +1,5 @@
 /* eslint no-fallthrough: "off" */
+if (typeof exports === 'undefined') exports = {};
 
 var p2s = /,?([a-z]),?/gi,
   toFloat = parseFloat,
@@ -428,7 +429,7 @@ function findBezierIntersections(bez1, bez2, justCount) {
  *
  * @return {Array<Intersection>|Number}
  */
-function findPathIntersections(path1, path2, justCount) {
+exports.intersect = function (path1, path2, justCount) {
   path1 = pathToCurve(path1);
   path2 = pathToCurve(path2);
 
@@ -981,6 +982,3 @@ function pathToCurve(path) {
 
   return curvedPath;
 }
-
-if (typeof exports === 'undefined') exports = {};
-exports.intersect = findPathIntersections;
