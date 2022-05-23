@@ -6,8 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.1.7] - 2022-05-23
 ### Fixed
 - settings pickers and custom inputs change together
+- mask htr token input
 
 ## [0.1.6] - 2022-05-22
 ### Changed

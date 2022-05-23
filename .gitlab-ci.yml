@@ -75,14 +75,27 @@ bump:
     - changes:
         - CHANGELOG.md
       if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  before_script:
+    - apt update && apt install -y jq
   script:
-    - | # if version was bumped in CHANGELOG, bump package.json, and push a new tag
-      LATEST=$(git show $CI_DEFAULT_BRANCH:package.json | jq -r '.version')
+    - | # if unpublished version was bumped in CHANGELOG, push a tag
+      set -eo pipefail
+
+      # use the CHANGELOG as the source of truth
       CURRENT=$(perl -lne 'print for /## \[(\d\.\d\.\d)\] /' CHANGELOG.md | head -1)
 
+      PACKAGE=$(jq -r '.version' package.json)
+      if [[ "$CURRENT" != "$PACKAGE" ]]; then
+        echo "ERROR: package.json version ($PACKAGE) does not match CHANGELOG version ($CURRENT)"
+        exit 1
+      fi
+
+      LATEST=$(npx vsce show hall.draw --json | jq -r '.versions[0].version')
       if [[ "$CURRENT" != "$LATEST" ]]; then
-        npm version "$CURRENT"
-        git push --atomic origin "$CI_COMMIT_BRANCH" "$CURRENT"
+        git tag "$CURRENT"
+
+        git remote set-url origin "https://git:$GITLAB_PAT@$CI_SERVER_HOST/$CI_PROJECT_PATH"
+        git push origin "$CURRENT"
       fi
 
 publish:

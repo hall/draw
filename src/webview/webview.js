@@ -70,7 +70,7 @@ const drawAPI = {
       lineContentInput.value = content;
     },
     setSVGContent(content) {
-      // 可能有问题的替换
+      //potentially problematic replacement
       svgElement.innerHTML = content
         .replace(/<svg id="svg"[^>]*>/, '')
         .replace(/<\/svg>/, '');
@@ -165,12 +165,13 @@ document.querySelector('#text-change-nextline').onclick = function () {
         provider: provider
       });
     };
-    vscode.postMessage({ command: 'requestCurrentLine' });
     vscode.postMessage({ command: 'requestCustom' });
 
     const state = vscode.getState();
     if (state && "svg" in state) {
       svgElement.innerHTML = state["svg"];
+    } else {
+      vscode.postMessage({ command: 'requestCurrentLine' });
     }
 
     setInterval(() => {

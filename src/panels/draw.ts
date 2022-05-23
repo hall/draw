@@ -123,8 +123,9 @@ export class Draw {
     }
 
     private inject(filepath: string) {
-        if (fs.lstatSync(filepath).isDirectory()) {
-            [...fs.readdirSync(filepath)].sort().forEach(p => this.inject(path.join(filepath, p)));
+        const absPath = path.join(this._extensionUri.fsPath, filepath);
+        if (fs.lstatSync(absPath).isDirectory()) {
+            [...fs.readdirSync(absPath)].sort().forEach(p => this.inject(path.join(filepath, p)));
             return;
         }
 
@@ -205,7 +206,10 @@ export class Draw {
                         if (link) content = fs.readFileSync(path.join(vscode.workspace.workspaceFolders[0].uri.path, link), { encoding: 'utf-8' });
                 }
                 if (topush) {
-                    Draw.currentPanel._panel.webview.postMessage({ command: 'currentLine', content: content || text });
+                    if (this.currentEditor)
+                        if (langs.readLink(this.currentEditor.document.languageId, text) || text?.startsWith("<svg")) {
+                            Draw.currentPanel._panel.webview.postMessage({ command: 'currentLine', content: content || text });
+                        }
                 }
             }
         }, 100);

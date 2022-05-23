@@ -1,6 +1,6 @@
 
 // return language formatted link to filename; optionally, with alt text
-export function createLink(language: string, filename: string, alt: string) {
+export function createLink(language: string, filename: string, alt: string): string | undefined {
     // https://hyperpolyglot.org/lightweight-markup
     switch (language) {
 
@@ -20,6 +20,7 @@ export function createLink(language: string, filename: string, alt: string) {
         //   return `[[${filename}]]`
 
     }
+    return undefined;
 }
 
 // return alt text and filename (in that order) from link in language format
