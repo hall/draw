@@ -124,8 +124,8 @@ export class Draw {
 
     private inject(filepath: string) {
         if (fs.lstatSync(filepath).isDirectory()) {
-            [...fs.readdirSync(filepath)].sort().forEach(p => this.inject(path.join(filepath, p)))
-            return
+            [...fs.readdirSync(filepath)].sort().forEach(p => this.inject(path.join(filepath, p)));
+            return;
         }
 
         const toolkitUri = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, ...[filepath]));
@@ -146,7 +146,7 @@ export class Draw {
     private _getHtmlForWebview(webview: vscode.Webview) {
         this.inject("./node_modules/@vscode/webview-ui-toolkit/dist/toolkit.js");
         this.inject("./node_modules/iink-js/dist/iink.min.js");
-        this.inject("./src/webview")
+        this.inject("./src/webview");
 
         return this.$.root().html();
     }
