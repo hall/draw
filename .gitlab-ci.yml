@@ -70,11 +70,11 @@ package:release:
 bump:
   stage: publish
   rules:
+    - if: $CI_COMMIT_TAG
+      when: never
     - changes:
         - CHANGELOG.md
       if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  except:
-    - tags
   script:
     - | # if version was bumped in CHANGELOG, bump package.json, and push a new tag
       LATEST=$(git show $CI_DEFAULT_BRANCH:package.json | jq -r '.version')
