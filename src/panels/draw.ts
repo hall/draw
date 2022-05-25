@@ -2,9 +2,7 @@ import * as vscode from 'vscode';
 import path = require('path');
 import fs = require('fs');
 import cheerio = require("cheerio");
-import { v4 as uuidv4 } from "uuid";
 
-import * as utils from '../utils';
 import * as langs from '../langs';
 
 
@@ -12,6 +10,7 @@ export class Draw {
     public static currentPanel: Draw | undefined;
 
     public static readonly viewType = 'draw';
+    public static settings = vscode.workspace.getConfiguration(Draw.viewType);
 
     private readonly _panel: vscode.WebviewPanel;
     private readonly _extensionUri: vscode.Uri;
@@ -26,15 +25,17 @@ export class Draw {
     private updateCheckStrings = ['', ''];
 
     private $: any;
-    private nonce = utils.nonce();
+    private nonce = nonce();
 
-    public static createOrShow(context: vscode.ExtensionContext) {
-        const column = vscode.window.activeTextEditor
-            ? vscode.window.activeTextEditor.viewColumn
-            : undefined;
+    /**
+     * create a new panel, or show the existing one, if available
+     * @param context the current extention context
+     */
+    public static createOrShow(context: vscode.ExtensionContext): void {
 
         // If we already have a panel, show it.
         if (Draw.currentPanel) {
+            const column = vscode.window?.activeTextEditor?.viewColumn || undefined;
             Draw.currentPanel._panel.reveal(column);
             return;
         }
@@ -63,7 +64,6 @@ export class Draw {
 
         this._panel.webview.onDidReceiveMessage(
             message => {
-
                 switch (message.command) {
                     case 'requestCurrentLine':
                         this.pushCurrentLine();
@@ -74,17 +74,13 @@ export class Draw {
                     case 'editCurrentLine':
                         this.setEditorText(message.text, message.control);
                         break;
-                    case 'copyToClipboard':
-                        vscode.env.clipboard.writeText(message.text);
-                        return;
                     case 'recognize':
                         context.secrets.get("token").then((token: any) => {
-                            if (Draw.currentPanel)
-                                Draw.currentPanel._panel.webview.postMessage({
-                                    command: 'recognize',
-                                    token: token,
-                                    provider: message.provider
-                                });
+                            Draw.currentPanel?._panel.webview.postMessage({
+                                command: 'recognize',
+                                token: token,
+                                provider: message.provider
+                            });
                         });
                         return;
                 }
@@ -96,34 +92,54 @@ export class Draw {
         this.realTimeCurrentEditorUpdate();
 
     }
-    public dispose() {
-        Draw.currentPanel = undefined;
 
+    /**
+     * remove the panel and dispose of its objects
+     */
+    public dispose(): void {
+        Draw.currentPanel = undefined;
         this._panel.dispose();
 
         // TODO: should include updateHandle?
         while (this._disposables.length) {
-            const x = this._disposables.pop();
-            if (x) {
-                x.dispose();
-            }
+            this._disposables.pop()?.dispose();
         }
     }
 
+    /**
+     * update the webview contents
+     */
     private _update() {
-        const webview = this._panel.webview;
-        const html = this._panel.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'src', 'webview', 'index.html'));
-        this.$ = cheerio.load(fs.readFileSync(html.path, { encoding: 'utf8' }));
+        // get the webview index
+        const html = path.resolve(this._extensionUri.fsPath, 'src', 'webview', 'index.html');
+
+        // load it into the fake dom
+        this.$ = cheerio.load(fs.readFileSync(html, { encoding: 'utf8' }));
+
         this.$("head").append(`<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-eval' 'nonce-${this.nonce}';">`);
-        this._panel.webview.html = this._getHtmlForWebview(webview);
+
+        this.inject("node_modules", "@vscode", "webview-ui-toolkit", "dist", "toolkit.js");
+        this.inject("node_modules", "iink-js", "dist", "iink.min.js");
+        this.inject("src", "webview");
+
+        this._panel.webview.html = this.$.root().html();
     }
 
+    /**
+     * recreate the panel
+     * @param panel
+     * @param context 
+     */
     public static revive(panel: vscode.WebviewPanel, context: vscode.ExtensionContext) {
         Draw.currentPanel = new Draw(panel, context);
     }
 
-    private inject(...filepath: string[]) {
-        const absPath = path.join(this._extensionUri.fsPath, ...filepath);
+    /**
+     * inject the contents at filepath into the dom
+     * @param filepath 
+     */
+    private inject(...filepath: string[]): void {
+        const absPath = path.resolve(this._extensionUri.fsPath, ...filepath);
         if (fs.lstatSync(absPath).isDirectory()) {
             [...fs.readdirSync(absPath)].sort().forEach(p => this.inject(path.join(...filepath, p)));
             return;
@@ -144,16 +160,12 @@ export class Draw {
         }
     }
 
-    private _getHtmlForWebview(webview: vscode.Webview) {
-        this.inject("node_modules", "@vscode", "webview-ui-toolkit", "dist", "toolkit.js");
-        this.inject("node_modules", "iink-js", "dist", "iink.min.js");
-        this.inject("src", "webview");
-
-        return this.$.root().html();
-    }
-
-    // get text from the editor
-    private getEditorText(show: boolean) {
+    /**
+     * get text from the editor
+     * @param show true if an error message should be displayed on error
+     * @returns 
+     */
+    private getEditorText(show: boolean) { //: { text: string, currentEditor_: vscode.TextEditor, currentLine_: number } {
         let currentEditor_ = this.currentEditor;
         let currentLine_ = this.currentLine;
         const activeTextEditor = vscode.window.activeTextEditor;
@@ -181,10 +193,9 @@ export class Draw {
         }
     }
 
-    private resetCheckStrings(str: string) {
-        this.updateCheckStrings[0] = this.updateCheckStrings[1] = str;
-    }
-
+    /**
+     * start an update loop to continuously update the editor
+     */
     private realTimeCurrentEditorUpdate() {
         this.updateHandle = setInterval(() => {
             const { text, currentEditor_, currentLine_ } = this.getEditorText(false);
@@ -198,12 +209,9 @@ export class Draw {
                 this.currentEditor = currentEditor_;
                 this.currentLine = currentLine_;
                 let content;
-                if (utils.settings.directory) {
-                    let link;
-                    if (this.currentEditor)
-                        link = langs.readLink(this.currentEditor.document.languageId, text);
-                    if (vscode.workspace.workspaceFolders)
-                        if (link) content = fs.readFileSync(path.join(vscode.workspace.workspaceFolders[0].uri.path, link), { encoding: 'utf-8' });
+                if (Draw.settings.directory) {
+                    const link = langs.readLink(this.currentEditor?.document.languageId || "markdown", text);
+                    if (link && link.filename) content = fs.readFileSync(link.filename, { encoding: 'utf-8' });
                 }
                 if (topush) {
                     if (this.currentEditor)
@@ -216,34 +224,19 @@ export class Draw {
     }
 
 
+    /**
+     *  write text to current editor's cursor position control
+     */
     private setEditorText(text: string, control: number) {
-        if (utils.settings.directory && !text.startsWith("$$")) {
-            let filename = `${uuidv4()}.svg`;
-            let alt = "";
-
-            // reuse existing alt and filename, if available
-            let match;
-            if (this.currentText)
-                match = this.currentText.match(/!\[(.*)\]\((.*\.svg)\)/);
-            if (match) {
-                alt = match[1];
-                filename = path.basename(match[2]);
-            }
-
-            if (this.currentEditor) {
-
-                let name;
-                if (text)
-                    name = utils.write(text, filename);
-                if (name)
-                    text = langs.createLink(this.currentEditor.document.languageId, name, alt) || "";
-
-            }
-        }
 
         if (!this.currentEditor || this.currentEditor.document.isClosed) {
             vscode.window.showErrorMessage('The text editor has been closed');
             return;
+        }
+
+        // if a directory is set and current line is not latex, set the text to a link
+        if (Draw.settings.directory && !text.startsWith("$$")) {
+            text = langs.createLink(this.currentEditor, text);
         }
 
         let p;
@@ -254,7 +247,7 @@ export class Draw {
             }).then((editor) => editor.edit(edit => {
                 if (this.currentLine)
                     edit.replace(new vscode.Range(this.currentLine, 0, this.currentLine + 1, 0), text + '\n');
-                this.resetCheckStrings(text.split('\n')[0] + '\n');
+                this.updateCheckStrings[0] = this.updateCheckStrings[1] = text.split('\n')[0] + '\n';
             }));
         }
 
@@ -271,9 +264,12 @@ export class Draw {
         }
     }
 
-    // add custom buttons to the toolbar
-    private pushCustom(context: vscode.ExtensionContext) {
-        let buttons = utils.settings['buttons'];
+    /**
+     * add custom buttons to the toolbar
+     * @param context the current extension context
+     */
+    private pushCustom(context: vscode.ExtensionContext): void {
+        let buttons = Draw.settings['buttons'];
         context.secrets.get("provider").then((provider: string | undefined) => {
             if (provider) {
                 buttons = [{
@@ -290,12 +286,27 @@ export class Draw {
         });
     }
 
-
 }
 
+/**
+ * get options for webview panel
+ * @param extensionUri the current extensions URI
+ * @returns a set of webview options
+ */
 export function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
         enableScripts: true,
         localResourceRoots: ['src/webview', 'node_modules'].map((i) => vscode.Uri.joinPath(extensionUri, i))
     };
+}
+
+
+// generate a nonce
+function nonce() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 32; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
 }

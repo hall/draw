@@ -1,17 +1,71 @@
+import path = require('path');
+import fs = require('fs');
+import vscode = require("vscode");
+import { v4 as uuidv4 } from "uuid";
 
-// return language formatted link to filename; optionally, with alt text
-export function createLink(language: string, filename: string, alt: string): string | undefined {
+const draw = vscode.workspace.getConfiguration("draw");
+
+/**
+ * return a formatted link to a file (relative to the current
+ * editor) with a randomly-generated UUID filename
+ * @param editor the text editor to create the link path in relation to
+ * @param text the content to write to a file
+ */
+export function createLink(editor: vscode.TextEditor, text: string): string {
+
+    // defaults
+    let filename = `${uuidv4()}.svg`;
+    let alt = "";
+    let link: string;
+
+    // reuse existing alt and filename, if available
+    const match = readLink(editor.document.languageId, text);
+    if (match) {
+        alt = match["alt"];
+        filename = path.basename(match["filename"]);
+    }
+
+    // path to file, start at current editor's directory
+    let filepath = path.dirname(editor.document.fileName);
+
+
+    if (vscode.workspace.workspaceFolders) {
+        // get the fullpath to the settings directory
+        let settings = path.join(vscode.workspace.workspaceFolders[0].uri.path, draw.directory);
+
+
+        // TODO: maybe a bug but this var is prefixed with an errant \ on win
+        while (settings.charAt(0) === '\\') settings = settings.substring(1);
+
+        // create the directory, if necessary
+        if (!fs.existsSync(settings)) {
+            fs.mkdirSync(settings, { recursive: true });
+        }
+
+        fs.writeFileSync(path.resolve(settings, filename), text, { encoding: 'utf8' });
+
+        // get relative path from editor to settings directory
+        filepath = path.relative(filepath, settings);
+    }
+
+    // append filename to relative path
+    filename = path.join(filepath, filename);
+
     // https://hyperpolyglot.org/lightweight-markup
-    switch (language) {
-
-        case 'markdown':
-            return `![${alt}](${filename})`;
+    switch (editor.document.languageId) {
 
         case 'asciidoc':
-            return `image::${filename}[${alt}]`;
+            link = `image::${filename}[${alt}]`;
+            break;
 
         case 'restructuredtext':
-            return `.. image:: ${filename}`; // TODO: add alt text `\n   :alt: ${alt}`
+            link = `.. image:: ${filename}`; // TODO: add alt text `\n   :alt: ${alt}`
+            break;
+
+        case 'markdown':
+        default:
+            link = `![${alt}](${filename})`;
+            break;
 
         // case 'mediawiki':
         //   return `[[File:${filename}|alt=${alt}]]`
@@ -20,18 +74,23 @@ export function createLink(language: string, filename: string, alt: string): str
         //   return `[[${filename}]]`
 
     }
-    return undefined;
+
+
+    return link;
 }
 
-// return alt text and filename (in that order) from link in language format
-export function readLink(language: string, link: string) {
-    // https://hyperpolyglot.org/lightweight-markup
+/**
+ * return alt text and filename from link in markup language format
+ * @param language a string which identifies the document's format (e.g., `markdown`)
+ * @param link the full text of the link itself
+ */
+export function readLink(language: string, link: string): {
+    alt: string, filename: string
+} | undefined {
     let match;
-    switch (language) {
 
-        case 'markdown':
-            match = link.match(/!\[(.*)\]\((.*)\)/);
-            break;
+    // https://hyperpolyglot.org/lightweight-markup
+    switch (language) {
 
         case 'asciidoc':
             match = link.match(/image::(.*)\[(.*)\]/);
@@ -43,6 +102,11 @@ export function readLink(language: string, link: string) {
             match = link.match(/..() image:: (.*)/);
             break;
 
+        case 'markdown':
+        default:
+            match = link.match(/!\[(.*)\]\((.*)\)/);
+            break;
+
         // case 'mediawiki':
         //   match = link.match()
         //   break
@@ -51,5 +115,11 @@ export function readLink(language: string, link: string) {
         //   match = link.match()
         //   break
     }
-    if (match) return match[1], match[2];
+
+    if (match && match?.length > 1 && vscode.window.activeTextEditor) {
+        match[2] = path.resolve(path.dirname(vscode.window.activeTextEditor.document?.fileName), match[2]);
+        return { alt: match[1], filename: match[2] };
+    }
+
+    return undefined;
 }
