@@ -2,7 +2,7 @@
 	"name": "draw",
 	"displayName": "Draw",
 	"description": "Draw an SVG image with a mouse or pen",
-	"version": "0.1.9",
+	"version": "0.1.10",
 	"publisher": "hall",
 	"icon": "docs/images/icon.png",
 	"license": "Apache-2.0",
@@ -43,7 +43,8 @@
 			{
 				"command": "draw.editCurrentLineAsSVG",
 				"title": "Edit current line",
-				"category": "Draw"
+				"category": "Draw",
+				"icon": "$(pencil)"
 			},
 			{
 				"command": "draw.configureHTR",
@@ -67,9 +68,10 @@
 				"draw.buttons": {
 					"type": "array",
 					"default": [],
-					"description": "Add custom buttons to the toolbar",
+					"markdownDescription": "Add [custom buttons](https://gitlab.com/hall/draw#custom-buttons) to the toolbar",
 					"items": {
 						"type": "object",
+						"additionalProperties": false,
 						"properties": {
 							"icon": {
 								"type": "string",
@@ -94,7 +96,7 @@
 				"draw.directory": {
 					"type": "string",
 					"default": "",
-					"description": "Save SVG to directory; write SVG inline if blank"
+					"description": "Save to directory (write inline if blank)"
 				}
 			}
 		}

@@ -82,7 +82,7 @@ bump:
       set -eo pipefail
 
       # use the CHANGELOG as the source of truth
-      CURRENT=$(perl -lne 'print for /## \[(\d\.\d\.\d)\] /' CHANGELOG.md | head -1)
+      CURRENT=$(perl -lne 'print for /## \[(\d*\.\d*\.\d*)\] /' CHANGELOG.md | head -1)
 
       PACKAGE=$(jq -r '.version' package.json)
       if [[ "$CURRENT" != "$PACKAGE" ]]; then
