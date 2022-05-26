@@ -22,6 +22,16 @@ The currently supported formats are
  - asciidoc
  - restructuredtext
 
+## Config
+
+The following settings are available (prefixed with `draw`).
+
+| setting   | description                                                           | default |
+| --------- | --------------------------------------------------------------------- | ------- |
+| directory | if set, save files to this directory (relative to the workspace root) | `""`    |
+| buttons   | add [custom buttons](#custom-buttons) to the toolbar                  | `[]`    |
+
+
 ## Custom Buttons
 
 To add custom buttons to the toolbar, add an entry to the `draw.buttons` array in `settings.json`; for example,
