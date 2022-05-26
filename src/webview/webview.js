@@ -84,7 +84,9 @@ const drawAPI = {
           button.appendChild(span);
           button.onclick = new Function(c.function);
 
-          document.querySelector('div.custom-buttons').appendChild(button);
+          let custom = document.querySelector('#custom-buttons')
+          custom.innerHTML += "\n"; // for some reason, the spacing is off w/o this newline
+          custom.appendChild(button)
         }
       });
     },

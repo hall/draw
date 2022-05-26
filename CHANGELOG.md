@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - removed some extraneous toolbar buttons
 ### Fixed
 - fixed bug that prevents writing to the beginning of a file
+- fixed spacing of custom buttons
 
 ## [0.1.9] - 2022-05-24
 ### Fixed
