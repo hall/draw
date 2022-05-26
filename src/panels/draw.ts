@@ -227,7 +227,7 @@ export class Draw {
     /**
      *  write text to current editor's cursor position control
      */
-    private setEditorText(text: string, control: number) {
+    private setEditorText(text: string, control: number): void {
 
         if (!this.currentEditor || this.currentEditor.document.isClosed) {
             vscode.window.showErrorMessage('The text editor has been closed');
@@ -240,12 +240,12 @@ export class Draw {
         }
 
         let p;
-        if (this.currentLine) {
+        if (this.currentLine !== undefined) {
             p = vscode.window.showTextDocument(this.currentEditor.document, {
                 viewColumn: this.currentEditor.viewColumn,
                 selection: new vscode.Range(this.currentLine, 0, this.currentLine, 0)
             }).then((editor) => editor.edit(edit => {
-                if (this.currentLine)
+                if (this.currentLine !== undefined)
                     edit.replace(new vscode.Range(this.currentLine, 0, this.currentLine + 1, 0), text + '\n');
                 this.updateCheckStrings[0] = this.updateCheckStrings[1] = text.split('\n')[0] + '\n';
             }));
