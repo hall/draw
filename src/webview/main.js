@@ -1089,7 +1089,7 @@ exports.initPaint = function (svgId, conf = null) {
 
   document.querySelectorAll(".svg-pen vscode-button").forEach(item => {
     click(item, e => {
-      document.querySelector(".svg-button .active")?.classList.remove("active");
+      document.querySelector("#svg-buttons .active")?.classList.remove("active");
       item.classList.add("active");
       config.type = item.getAttribute("data-type");
     });
@@ -1150,7 +1150,7 @@ exports.initPaint = function (svgId, conf = null) {
 
   document.querySelectorAll(".svg-shape vscode-button").forEach(item => {
     click(item, (e) => {
-      document.querySelector(".svg-button .active")?.classList.remove("active");
+      document.querySelector("#svg-buttons .active")?.classList.remove("active");
       item.classList.add("active");
       config.type = item.getAttribute("data-type");
     });
@@ -1182,19 +1182,14 @@ exports.initPaint = function (svgId, conf = null) {
 
   toggle("#show-settings", "#settings");
 
-  click("#svg-nextline", e => {
-    document.querySelector('#text-change-nextline')?.onclick();
-  });
-
-  (['change-stay', 'change-nextline']).forEach(s => {
-    click("#svg-" + s, e => {
+  click("#svg-save", e => {
       let textarea = document.createElement("textarea");
       let { x, y, width, height } = svg.getBBox();
       textarea.value = svg.outerHTML.replace('<svg id="svg">',
         `<svg id="svg" xmlns="${svgns}" viewBox="${x - 10} ${y - 10} ${width + 20} ${height + 20}" height="${height + 20}">`);
-      document.querySelector("#images").append(textarea);
-      window?.drawAPI.unstable.setTextContent(textarea.value + '  ');
-      document.querySelector('#text-' + s)?.onclick();
+    window?.drawAPI.unstable.editCurrentLine({
+      control: 0,
+      text: textarea.value
     });
   });
 

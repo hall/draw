@@ -7,7 +7,6 @@ if (typeof require !== 'undefined') {
 const exposedFunctions = initPaint("svg");
 
 const svgElement = document.getElementById('svg');
-const lineContentInput = document.querySelector('#svg-text');
 
 const drawAPI = {
   unstable: {
@@ -16,13 +15,6 @@ const drawAPI = {
      * @param {String} text text
      * @param {Number} control moving number of the cursor
      */
-    editCurrentLine({ text, control }) {
-      console.log({
-        text,
-        control,
-        command: 'editCurrentLine',
-      });
-    },
     getSVGElement: () => svgElement,
     /**
      * 
@@ -66,9 +58,6 @@ const drawAPI = {
     reRegisterSVG() {
       exposedFunctions.reInit();
     },
-    setTextContent(content) {
-      lineContentInput.value = content;
-    },
     setSVGContent(content) {
       //potentially problematic replacement
       svgElement.innerHTML = content
@@ -77,7 +66,6 @@ const drawAPI = {
       drawAPI.unstable.reRegisterSVG();
     },
     setContent(content) {
-      drawAPI.unstable.setTextContent(content);
       document.querySelector("#svg-clean")?.dispatchEvent(new Event('click'));
       // inaccurate check, write this first
       if (content.startsWith('<svg id="svg"')) {
@@ -123,24 +111,6 @@ window.addEventListener('message', event => {
   }
 });
 
-document.querySelector('#text-nextline').onclick = function () {
-  drawAPI.unstable.editCurrentLine({
-    control: 1,
-    text: lineContentInput.value
-  });
-};
-document.querySelector('#text-change-stay').onclick = function () {
-  drawAPI.unstable.editCurrentLine({
-    control: 0,
-    text: lineContentInput.value
-  });
-};
-document.querySelector('#text-change-nextline').onclick = function () {
-  drawAPI.unstable.editCurrentLine({
-    control: 1,
-    text: lineContentInput.value
-  });
-};
 
 (function () {
   if (typeof acquireVsCodeApi !== 'undefined') {
@@ -150,12 +120,6 @@ document.querySelector('#text-change-nextline').onclick = function () {
         text,
         control,
         command: 'editCurrentLine',
-      });
-    };
-    drawAPI.unstable.copyToClipboard = (text) => {
-      vscode.postMessage({
-        text,
-        command: 'copyToClipboard',
       });
     };
     // TODO: add loading spinner or something

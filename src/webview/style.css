@@ -10,14 +10,12 @@ body {
   color: --vscode-foreground;
 }
 
-
 .title,
 .container {
   left: 50%;
   transform: translateX(-50%);
   position: relative;
 }
-
 
 .active {
   color: var(--vscode-focusBorder);
@@ -39,9 +37,9 @@ body {
   height: 100%;
 }
 
-.svg-button {
-  height: 35px;
+#svg-buttons {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   padding: 0px 8px;
   box-sizing: border-box;
@@ -49,10 +47,15 @@ body {
   overflow-y: auto;
 }
 
+#svg-buttons vscode-button {
+  /* match panel tab height */
+  height: 35px;
+}
+
 .svgiconspliter {
   /* border-left: 1px solid var(--vscode-panel-border);
   border-right: 0 1px solid var(--vscode-panel-border); */
-  height: 12px;
+  height: 15px;
   margin: 0 8px;
 }
 

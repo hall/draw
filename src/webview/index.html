@@ -8,17 +8,11 @@
 </head>
 
 <body>
-  <input id="svg-text" type="text" placeholder="current line" ; style="display: none">
-  <div style="display: none;">
-    <input type="button" value="nextline" id="text-nextline">
-    <input type="button" value="stay-nextline" id="text-change-stay">
-    <input type="button" value="change-nextline" id="text-change-nextline">
-  </div>
 
   <div>
     <div class="container">
 
-      <div class="svg-button">
+      <div id="svg-buttons">
 
         <div class="svg-pen">
           <vscode-button appearance="icon" aria-label="pen" data-type="pen">
@@ -31,10 +25,12 @@
             <span class="fa fa-font" title="text"></span>
           </vscode-button>
           <vscode-button appearance="icon" aria-label="select" data-type="select">
-            <span class="fa fa-pencil-ruler" title="select"></span>
+            <span class="fa fa-mouse-pointer" title="select"></span>
           </vscode-button>
         </div>
+
         <span class="svgiconspliter"></span>
+
         <div class="svg-shape">
           <vscode-button appearance="icon" aria-label="line" data-type="line">
             <span class="fa fa-slash" title="line"></span>
@@ -58,8 +54,13 @@
             <span class="fa fa-layer-group" title="diamond"></span>
           </vscode-button>
         </div>
+
         <span class="svgiconspliter"></span>
+
         <div class="svg-operate">
+          <vscode-button appearance="icon" aria-label="save">
+            <span class="fa fa-save" id="svg-save" title="save"></span>
+          </vscode-button>
           <vscode-button appearance="icon" aria-label="settings">
             <span class="fa fa-sliders-h" id="show-settings" title="settings"></span>
           </vscode-button>
@@ -73,21 +74,13 @@
             <span class="fa fa-trash" id="svg-clean" title="clear"></span>
           </vscode-button>
         </div>
+
         <span class="svgiconspliter"></span>
-        <div>
-          <vscode-button appearance="icon" aria-label="go next line">
-            <span class="fa fa-arrow-down" id="svg-nextline" title="go next line"></span>
-          </vscode-button>
-          <vscode-button appearance="icon" aria-label="change and stay">
-            <span class="fa fa-check-square" id="svg-change-stay" title="change and stay"></span>
-          </vscode-button>
-          <vscode-button appearance="icon" aria-label="change and go to next line">
-            <span class="fa fa-caret-square-down" id="svg-change-nextline" title="change and go next line"></span>
-          </vscode-button>
-        </div>
-        <span class="svgiconspliter"></span>
+
         <div class="custom-buttons"></div>
+
       </div>
+
     </div>
 
     <form id="settings" style="display: none;">
@@ -137,12 +130,13 @@
       <label for="text">text</label>
       <input type="number" id="text-size" value="14" />
     </form>
+
   </div>
+
   <div class="svg-container">
     <svg id="svg"></svg>
   </div>
-  <div id="images" style="display: none;"></div>
-  </div>
+
 </body>
 
 </html>
