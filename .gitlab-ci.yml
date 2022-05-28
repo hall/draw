@@ -4,12 +4,12 @@ include:
   - template: License-Scanning.gitlab-ci.yml
   - template: Secret-Detection.gitlab-ci.yml
 
-# run the pipeline only on MRs, tags, and default branch
+# run the pipeline only on MRs and default branch
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - when: never
 
 image: node:16
 
@@ -53,25 +53,14 @@ test:
     paths:
       - "*.vsix"
 
-package:test:
+package:
   extends: .package
   artifacts:
-    expire_in: 10 days
-  except:
-    - tags
+    expire_in: 1 mos
 
-package:release:
-  extends: .package
-  artifacts:
-    expire_in: 1 year
-  only:
-    - tags
-
-bump:
+publish:
   stage: publish
   rules:
-    - if: $CI_COMMIT_TAG
-      when: never
     - changes:
         - CHANGELOG.md
       if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -91,21 +80,16 @@ bump:
       fi
 
       LATEST=$(npx vsce show hall.draw --json | jq -r '.versions[0].version')
-      if [[ "$CURRENT" != "$LATEST" ]]; then
-        git tag "$CURRENT"
-
-        git remote set-url origin "https://git:$GITLAB_PAT@$CI_SERVER_HOST/$CI_PROJECT_PATH"
-        git push origin "$CURRENT"
+      if [[ "$CURRENT" == "$LATEST" ]]; then
+        exit 0
       fi
 
-publish:
-  stage: publish
-  script:
-    - npm ci
-    - npx ovsx publish *.vsix -p $OPENVSX_ACCESS_TOKEN
-    - npx vsce publish --packagePath *.vsix -p $AZURE_ACCESS_TOKEN
-  only:
-    - tags
+        git tag "$CURRENT"
+        git remote set-url origin "https://git:$GITLAB_PAT@$CI_SERVER_HOST/$CI_PROJECT_PATH"
+        git push origin "$CURRENT"
+
+      npx ovsx publish *.vsix -p $OPENVSX_ACCESS_TOKEN
+      npx vsce publish --packagePath *.vsix -p $AZURE_ACCESS_TOKEN
 
 # https://gitlab.com/gitlab-org/gitlab-vscode-extension/-/blob/main/.gitlab-ci.yml
 # run security scanning on every pipeline execution; https://gitlab.com/gitlab-org/gitlab/-/issues/217668
