@@ -37,7 +37,7 @@ test:
         libdrm-dev \
         libgtk-3-dev \
         libnss3 \
-        xvfb
+        xvfb > /dev/null
     - Xvfb -ac :99 -screen 0 1920x1080x16 &
     - dbus-daemon --system &
   script:
@@ -89,9 +89,9 @@ publish:
         exit 0
       fi
 
-        git tag "$CURRENT"
-        git remote set-url origin "https://git:$GITLAB_PAT@$CI_SERVER_HOST/$CI_PROJECT_PATH"
-        git push origin "$CURRENT"
+      git tag "$CURRENT"
+      git remote set-url origin "https://git:$GITLAB_PAT@$CI_SERVER_HOST/$CI_PROJECT_PATH"
+      git push origin "$CURRENT"
 
       npx ovsx publish *.vsix -p $OPENVSX_ACCESS_TOKEN
       npx vsce publish --packagePath *.vsix -p $AZURE_ACCESS_TOKEN
