@@ -1,5 +1,6 @@
 *.vsix
 node_modules/
 out/
-.vscode-test/
+
+test-resources/
 test-results.xml

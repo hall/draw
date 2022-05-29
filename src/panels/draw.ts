@@ -111,7 +111,7 @@ export class Draw {
      */
     private _update() {
         // get the webview index
-        const html = path.resolve(this._extensionUri.fsPath, 'src', 'webview', 'index.html');
+        const html = path.resolve(this._extensionUri.fsPath, 'out', 'webview', 'index.html');
 
         // load it into the fake dom
         this.$ = cheerio.load(fs.readFileSync(html, { encoding: 'utf8' }));
@@ -120,7 +120,7 @@ export class Draw {
 
         this.inject("node_modules", "@vscode", "webview-ui-toolkit", "dist", "toolkit.js");
         this.inject("node_modules", "iink-js", "dist", "iink.min.js");
-        this.inject("src", "webview");
+        this.inject("out", "webview");
 
         this._panel.webview.html = this.$.root().html();
     }
