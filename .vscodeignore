@@ -1,7 +1,7 @@
-src/
-.vscode/
+src/**
+.vscode/**
 .gitignore
-node_modules/@types/
+node_modules/@types/**
 flake.*
 .gitlab-ci.yml
 tsconfig.json

@@ -1183,15 +1183,79 @@ exports.initPaint = function (svgId, conf = null) {
   toggle("#show-settings", "#settings");
 
   click("#svg-save", e => {
-      let textarea = document.createElement("textarea");
-      let { x, y, width, height } = svg.getBBox();
-      textarea.value = svg.outerHTML.replace('<svg id="svg">',
-        `<svg id="svg" xmlns="${svgns}" viewBox="${x - 10} ${y - 10} ${width + 20} ${height + 20}" height="${height + 20}">`);
+    let textarea = document.createElement("textarea");
+    let { x, y, width, height } = svg.getBBox();
+    textarea.value = svg.outerHTML.replace('<svg id="svg">',
+      `<svg id="svg" xmlns="${svgns}" viewBox="${x - 10} ${y - 10} ${width + 20} ${height + 20}" height="${height + 20}">`);
     window?.drawAPI.unstable.editCurrentLine({
       control: 0,
       text: textarea.value
     });
   });
+
+
+  document.onkeydown = function (e) {
+    var evtobj = window.event ? event : e
+
+    // undo (Ctrl + Z)
+    if (evtobj.keyCode == 90 && evtobj.ctrlKey) {
+      if (undoList.length < 1) return;
+
+      let undoEle = undoList.pop();
+      undoEle.remove();
+      redoList.push(undoEle);
+      redoBoxSizeList.push(boxSizeList.pop());
+    }
+
+    // redo (Ctrl + Y)
+    if (evtobj.keyCode == 89 && evtobj.ctrlKey) {
+      if (redoList.length < 1) return;
+
+      let redoEle = redoList.pop();
+      svg.append(redoEle);
+      undoList.push(redoEle);
+      boxSizeList.push(redoBoxSizeList.pop());
+    }
+
+    //F4
+    if (evtobj.keyCode == 115) {
+      config.type = "pen";
+      e.pointerType = "pen";
+    }
+
+    //F6
+    if (evtobj.keyCode == 117) {
+      config.type = "eraser";
+      e.pointerType = "eraser";
+    }
+
+    //F7
+    if (evtobj.keyCode == 118) {
+      config.type = "rect";
+      e.pointerType = "rect";
+    }
+
+    //F8
+    if (evtobj.keyCode == 119) {
+      config.type = "circle";
+      e.pointerType = "circle";
+    }
+
+    //F9
+    if (evtobj.keyCode == 120) {
+      config.type = "select";
+      e.pointerType = "select";
+    }
+
+    //F10
+    if (evtobj.keyCode == 121) {
+      undoList = [];
+      redoList = [];
+      boxSizeList = [];
+      redoBoxSizeList = [];
+      svg.innerHTML = "";
+    }
+  }
 
   return { reInit };
 }

@@ -1,6 +1,6 @@
 import vscode = require("vscode");
 
-import { Draw, getWebviewOptions } from './panels/draw';
+import { Draw, getWebviewOptions } from './draw';
 import htr = require("./htr");
 
 export function activate(context: vscode.ExtensionContext) {

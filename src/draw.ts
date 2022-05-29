@@ -3,28 +3,39 @@ import path = require('path');
 import fs = require('fs');
 import cheerio = require("cheerio");
 
-import * as langs from '../langs';
+import * as langs from './langs';
 
 
 export class Draw {
+    /** singleton of the currently open panel */
     public static currentPanel: Draw | undefined;
 
+    /** id which defines the webpanel view type */
     public static readonly viewType = 'draw';
+
+    /** user-provided settings */
     public static settings = vscode.workspace.getConfiguration(Draw.viewType);
 
+    /** the webview panel object */
     private readonly _panel: vscode.WebviewPanel;
+    /** the current extension uri */
     private readonly _extensionUri: vscode.Uri;
+    /** a list of disposable objects */
     private _disposables: vscode.Disposable[] = [];
 
-    // values for editing status
+    /** the target editor for modification */
     private currentEditor: vscode.TextEditor | undefined = undefined;
+    /** the current line number in the target editor */
     private currentLine: number | undefined = 0;
+    /** the text on the currentLine of the currentEditor */
     private currentText: string | undefined = "";
     private updateHandle: any = undefined;
 
     private updateCheckStrings = ['', ''];
 
+    /** the dom, currently provided by cheerio */
     private $: any;
+    /** a pseudo-randomly generated value */
     private nonce = nonce();
 
     /**
@@ -35,7 +46,7 @@ export class Draw {
 
         // If we already have a panel, show it.
         if (Draw.currentPanel) {
-            const column = vscode.window?.activeTextEditor?.viewColumn || undefined;
+            const column = vscode.window?.activeTextEditor?.viewColumn;
             Draw.currentPanel._panel.reveal(column);
             return;
         }
@@ -111,7 +122,7 @@ export class Draw {
      */
     private _update() {
         // get the webview index
-        const html = path.resolve(this._extensionUri.fsPath, 'out', 'webview', 'index.html');
+        const html = path.resolve(this._extensionUri.fsPath, 'webview', 'index.html');
 
         // load it into the fake dom
         this.$ = cheerio.load(fs.readFileSync(html, { encoding: 'utf8' }));
@@ -120,7 +131,7 @@ export class Draw {
 
         this.inject("node_modules", "@vscode", "webview-ui-toolkit", "dist", "toolkit.js");
         this.inject("node_modules", "iink-js", "dist", "iink.min.js");
-        this.inject("out", "webview");
+        this.inject("webview");
 
         this._panel.webview.html = this.$.root().html();
     }
@@ -173,7 +184,8 @@ export class Draw {
             currentEditor_ = activeTextEditor;
         }
         if (!currentEditor_ || currentEditor_.document.isClosed) {
-            if (show) vscode.window.showErrorMessage('No active line');
+            Draw.currentPanel?.disable();
+            // if (show) vscode.window.showErrorMessage('No active line');
             return {};
         }
         currentLine_ = currentEditor_.selection.active.line;
@@ -183,14 +195,34 @@ export class Draw {
         return { text, currentEditor_, currentLine_ };
     }
 
-    // write text to the editor
-    private pushCurrentLine() {
+    /**
+     * Copy svg back to editor
+     */
+    private pushCurrentLine(): void {
         const { text, currentEditor_, currentLine_ } = this.getEditorText(true);
         if (typeof text === 'string' && Draw.currentPanel) {
             this.currentEditor = currentEditor_;
             this.currentLine = currentLine_;
             Draw.currentPanel._panel.webview.postMessage({ command: 'currentLine', content: text });
         }
+    }
+
+    /**
+     * disable the panel's interactions with the editor
+     *
+     * This is generally done when either there is no active editor or the
+     * correct one is ambiguous.
+     */
+    public disable(): void {
+        if (!this.currentEditor)
+            Draw.currentPanel?._panel.webview.postMessage({ command: "setState", state: "disabled" });
+    }
+
+    /**
+     * enable the panel's interactions with the editor
+     */
+    public enable(): void {
+        Draw.currentPanel?._panel.webview.postMessage({ command: "setState", state: "enabled" });
     }
 
     /**
@@ -296,7 +328,7 @@ export class Draw {
 export function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
     return {
         enableScripts: true,
-        localResourceRoots: ['src/webview', 'node_modules'].map((i) => vscode.Uri.joinPath(extensionUri, i))
+        localResourceRoots: ['webview', 'node_modules'].map((i) => vscode.Uri.joinPath(extensionUri, i))
     };
 }
 

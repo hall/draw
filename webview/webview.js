@@ -110,6 +110,19 @@ window.addEventListener('message', event => {
     case 'recognize':
       window[message.provider](message.token);
       break;
+    case 'setState':
+      switch (message.state) {
+        case 'enabled':
+          console.log("enable")
+          document.querySelector("#svg-save").parentElement.disabled = false;
+          break;
+        case 'disabled':
+          console.log("disable")
+          document.querySelector("#svg-save").parentElement.disabled = true;
+          break;
+
+      }
+      break;
   }
 });
 
@@ -135,8 +148,10 @@ window.addEventListener('message', event => {
 
     const state = vscode.getState();
     if (state && "svg" in state) {
+      // use saved state, if any
       svgElement.innerHTML = state["svg"];
     } else {
+      // or start with drawing under selection
       vscode.postMessage({ command: 'requestCurrentLine' });
     }
 

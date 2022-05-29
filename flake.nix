@@ -9,33 +9,34 @@
           name = "fhs";
           runScript = "bash";
           targetPkgs = pkgs: with pkgs; [
+	    # dev
             nodejs
             gitlab-runner
 
-            glib
-            wayland
-            gtk3
-            nss
-            nspr
-            atk
+	    # test
+            alsa-lib
             at-spi2-atk
-            dbus
-            libdrm
-            pango
+            at-spi2-core
+            atk
             cairo
+            dbus
+            expat
             gdk-pixbuf
+            glib
+            gtk3
+            libdrm
+            libxkbcommon
+            mesa
+            nspr
+            nss
+            pango
             xorg.libX11
             xorg.libXcomposite
             xorg.libXdamage
             xorg.libXext
             xorg.libXfixes
             xorg.libXrandr
-            mesa
-            expat
             xorg.libxcb
-            libxkbcommon
-            alsa-lib
-            at-spi2-core
 
             libdbusmenu
             (lib.getLib systemd)

@@ -1,6 +1,6 @@
-import path = require('path');
-import fs = require('fs');
-import vscode = require("vscode");
+import * as path from 'path';
+import * as fs from 'fs';
+import * as vscode from "vscode";
 import { v4 as uuidv4 } from "uuid";
 
 const draw = vscode.workspace.getConfiguration("draw");
