@@ -7,7 +7,7 @@ describe('Extension', () => {
     let webview: WebView;
 
     before(async function () {
-        this.timeout(10000); // ci needs some time
+        this.timeout(120000); // ci needs some time
 
         await new Workbench().executeCommand('draw edit');
         await sleep(1000);

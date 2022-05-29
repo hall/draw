@@ -9,3 +9,4 @@ tsconfig.json
 test-resources/**
 test-results.xml
 .mocharc.js
+index.scip
