@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - disable save button when there is no editor
+- update font awesome to version 6
 
 ## [0.1.10] - 2022-05-25
 ### Changed

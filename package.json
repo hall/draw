@@ -63,13 +63,13 @@
 		"commands": [
 			{
 				"command": "draw.editCurrentLineAsSVG",
-				"title": "Edit current line",
+				"title": "Edit Current Line",
 				"category": "Draw",
 				"icon": "$(pencil)"
 			},
 			{
 				"command": "draw.configureHTR",
-				"title": "Configure HTR provider",
+				"title": "Configure HTR Provider",
 				"category": "Draw"
 			}
 		],
@@ -131,6 +131,7 @@
 		"test": "extest setup-and-run ./out/**/*.test.js"
 	},
 	"dependencies": {
+		"@fortawesome/fontawesome-free": "^6.1.1",
 		"@vscode/webview-ui-toolkit": "^1.0.0",
 		"cheerio": "^1.0.0-rc.10",
 		"iink-js": "^1.5.4",

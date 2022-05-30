@@ -11,10 +11,10 @@ Draw an SVG image with a mouse or pen.
 
 ## Usage
 
-Open a file (in a supported format) and run `Draw: Edit current line` by either
+Open a file (in a supported format) and run `Draw: Edit Current Line` by either
 
  - right clicking on the line or
- - opening the command palette (`F1` or `Ctrl-Shft-P`) and type `svg`
+ - opening the command palette (`F1` or `Ctrl-Shft-P`) and type `draw edit`
 
 The currently supported formats are
 
@@ -46,7 +46,7 @@ To add custom buttons to the toolbar, add an entry to the `draw.buttons` array i
 ]
 ```
 
-> search the [Font Awesome](https://fontawesome.com/v5/search?m=free) set for an icon name
+> search the [Font Awesome](https://fontawesome.com/v6/search?m=free&s=solid) set for an icon name
 
 ## Handwritten Text Recognition
 
@@ -58,7 +58,7 @@ The following services are available to convert hand-written formulas to LaTeX e
 
  - create [an account](https://developer.myscript.com/getting-started/web)
  - generate application and HMAC tokens
- - run `Draw: Configure HTR provider` and select `myscript`
+ - run `Draw: Configure HTR Provider` and select `myscript`
 
 ### mathpix
 
@@ -68,7 +68,7 @@ This integration also supports image drag and paste.
 
  - create [an account](https://mathpix.com/docs/ocr/overview)
  - create an org, pay the setup fee, and create an API key
- - run `Draw: Configure HTR provider` and select `mathpix`
+ - run `Draw: Configure HTR Provider` and select `mathpix`
 
 
 ## License

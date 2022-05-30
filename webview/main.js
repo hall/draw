@@ -270,7 +270,7 @@ exports.initPaint = function (svgId, conf = null) {
         tempPoint += `${x} ${y}, `;
       }
     }
-    if (config.type === "diamond") {
+    if (config.type === "rhombus") {
       svgCurrEle = document.createElementNS(svgns, "polygon");
       svgCurrEle.setAttributeNS(null, "points", `${x} ${y}`);
       tempPoint = { x, y };
@@ -871,7 +871,7 @@ exports.initPaint = function (svgId, conf = null) {
     if (config.type === "polygon") {
       svgCurrEle.setAttributeNS(null, "points", tempPoint + `${x} ${y}`);
     }
-    if (config.type === "diamond") {
+    if (config.type === "rhombus") {
       let x2 = (x + tempPoint.x) / 2;
       let y2 = (y + tempPoint.y) / 2;
       svgCurrEle.setAttributeNS(
@@ -956,7 +956,7 @@ exports.initPaint = function (svgId, conf = null) {
       drawMoveOpen = true;
       return;
     }
-    if (config.type === "diamond") {
+    if (config.type === "rhombus") {
       svgCurrEle.setAttributeNS(
         null,
         "d",

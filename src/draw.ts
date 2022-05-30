@@ -101,7 +101,6 @@ export class Draw {
         );
 
         this.realTimeCurrentEditorUpdate();
-
     }
 
     /**
@@ -127,8 +126,11 @@ export class Draw {
         // load it into the fake dom
         this.$ = cheerio.load(fs.readFileSync(html, { encoding: 'utf8' }));
 
+        // add a CSP with the nonce
         this.$("head").append(`<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-eval' 'nonce-${this.nonce}';">`);
 
+        // inject dependencies
+        this.inject("node_modules", "@fortawesome", "fontawesome-free", "js", "all.min.js");
         this.inject("node_modules", "@vscode", "webview-ui-toolkit", "dist", "toolkit.js");
         this.inject("node_modules", "iink-js", "dist", "iink.min.js");
         this.inject("webview");

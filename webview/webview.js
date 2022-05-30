@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+
 if (typeof require !== 'undefined') {
   var { initPaint } = require('./main');
 } else {
@@ -66,7 +68,7 @@ const drawAPI = {
       drawAPI.unstable.reRegisterSVG();
     },
     setContent(content) {
-      document.querySelector("#svg-clean")?.dispatchEvent(new Event('click'));
+      document.querySelector("#svg-clean")?.click();
       // inaccurate check, write this first
       if (content.startsWith('<svg id="svg"')) {
         drawAPI.unstable.setSVGContent(content);
@@ -75,13 +77,13 @@ const drawAPI = {
     custom(content) {
       content.forEach((c) => {
         if (c.type === undefined || c.type === 'script') {
-          let span = document.createElement("span");
-          span.classList.add("fa", `fa-${c.icon}`);
-          span.title = c.title;
+          let icon = document.createElement("i");
+          icon.classList.add("fa-solid", `fa-${c.icon}`);
+          icon.title = c.title;
           let button = document.createElement("vscode-button");
           button.setAttribute("appearance", "icon");
           button.setAttribute("aria-label", c.title);
-          button.appendChild(span);
+          button.appendChild(icon);
           button.onclick = new Function(c.function);
 
           let custom = document.querySelector('#custom-buttons')
@@ -113,11 +115,9 @@ window.addEventListener('message', event => {
     case 'setState':
       switch (message.state) {
         case 'enabled':
-          console.log("enable")
           document.querySelector("#svg-save").parentElement.disabled = false;
           break;
         case 'disabled':
-          console.log("disable")
           document.querySelector("#svg-save").parentElement.disabled = true;
           break;
 
