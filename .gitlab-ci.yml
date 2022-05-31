@@ -49,29 +49,30 @@ test:
       junit:
         - test-results.xml
 
-navigation:
-  stage: test
-  image: sourcegraph/scip-typescript:v0
-  allow_failure: true # recommended
-  script:
-    - scip-typescript index
-  artifacts:
-    reports:
-      lsif: index.scip
+## currently returns a 500: https://gitlab.com/hall/draw/-/jobs/2520086017
+# navigation:
+#   stage: test
+#   image: sourcegraph/scip-typescript:v0
+#   allow_failure: true # recommended
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#   script:
+#     - scip-typescript index
+#   artifacts:
+#     reports:
+#       lsif: index.scip
 
-.package:
+package:
   stage: package
   script:
     - npm ci
     - npx vsce package
-  artifacts:
-    paths:
-      - "*.vsix"
-
-package:
-  extends: .package
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   artifacts:
     expire_in: 1 mos
+    paths:
+      - "*.vsix"
 
 publish:
   stage: publish
