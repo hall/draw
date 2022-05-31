@@ -3,12 +3,9 @@ function mathpix(token) {
     drawAPI.unstable.getPNG((dataURL) => {
         drawAPI.unstable.setTextContent('calling the API');
         xhrPost(dataURL, (err, ret) => {
-            let latex = JSON.parse(ret)['latex'];
-            let content = '$$' + latex.trim() + '$$ ' + ' ';
-            drawAPI.unstable.setTextContent('');
             drawAPI.unstable.editCurrentLine({
                 control: 0,
-                text: content
+                text: '$$' + JSON.parse(ret)["latex"].trim() + '$$'
             });
         });
     });

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.13] - 2022-05-31
+
+### Fixed
+- fix HTR and custom buttons click events
+
 ## [0.1.12] - 2022-05-31
 
 ### Changed

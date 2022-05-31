@@ -2,7 +2,7 @@
 	"name": "draw",
 	"displayName": "Draw",
 	"description": "Draw an SVG image with a mouse or pen",
-	"version": "0.1.12",
+	"version": "0.1.13",
 	"publisher": "hall",
 	"icon": "docs/images/icon.png",
 	"license": "Apache-2.0",
@@ -16,7 +16,7 @@
 		"vscode": "^1.53.0"
 	},
 	"categories": [
-		"Programming Languages"
+		"Other"
 	],
 	"keywords": [
 		"markdown",

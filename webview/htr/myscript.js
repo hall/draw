@@ -60,17 +60,12 @@ function myscript(token) {
     // Defining the behaviour on recognition result
     const recognitionCallback = (err, x) => {
         if (!err) {
-            Object.entries(x.exports)
-                .forEach(([mimeType, exportValue]) => {
-
-                    let latex = x.exports[mimeType];
-                    let content = '$$' + latex.trim() + '$$ ' + ' ';
-                    drawAPI.unstable.setTextContent('');
-                    drawAPI.unstable.editCurrentLine({
-                        control: 0,
-                        text: content
-                    });
+            Object.entries(x.exports).forEach(([mimeType, exportValue]) => {
+                drawAPI.unstable.editCurrentLine({
+                    control: 0,
+                    text: '$$' + x.exports[mimeType].trim() + '$$'
                 });
+            });
         }
     };
 

@@ -83,11 +83,11 @@ const drawAPI = {
           let button = document.createElement("vscode-button");
           button.setAttribute("appearance", "icon");
           button.setAttribute("aria-label", c.title);
-          button.appendChild(icon);
           button.onclick = new Function(c.function);
+          button.appendChild(icon);
 
           let custom = document.querySelector('#custom-buttons');
-          custom.innerHTML += "\n"; // for some reason, the spacing is off w/o this newline
+          custom.appendChild(document.createTextNode("\n")); // for some reason, the spacing is off w/o this newline
           custom.appendChild(button);
         }
       });
