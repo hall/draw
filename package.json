@@ -30,7 +30,7 @@
 		"svg"
 	],
 	"activationEvents": [
-		"onWebviewPanel:drawPane",
+		"onWebviewPanel:draw",
 		"onCommand:draw.editCurrentLineAsSVG",
 		"onCommand:draw.configureHTR",
 		"onLanguage:markdown",
