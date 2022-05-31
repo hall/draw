@@ -19,9 +19,6 @@ module.exports = {
     },
     devtool: 'source-map',
     externals: { // these modules should not be bundled
-        crypto: 'commonjs crypto',
-        fs: 'commonjs fs',
-        path: 'commonjs path',
         vscode: 'commonjs vscode',
     },
     resolve: {
@@ -66,4 +63,11 @@ module.exports = {
             }
         ]
     },
+    plugins: [
+        // Work around for Buffer is undefined:
+        // https://github.com/webpack/changelog-v5/issues/10#issuecomment-615877593
+        new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+        }),
+    ]
 };

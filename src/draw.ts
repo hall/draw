@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 
 import * as langs from './langs';
-
 import html from '../webview/index.html';
 
 export class Draw {
@@ -185,14 +183,19 @@ export class Draw {
                 let content;
                 if (Draw.settings.directory) {
                     const link = langs.readLink(this.currentEditor?.document.languageId || "markdown", text);
-                    if (link && link.filename) content = fs.readFileSync(link.filename, { encoding: 'utf-8' });
-                }
-                if (topush) {
-                    if (this.currentEditor)
-                        if (langs.readLink(this.currentEditor.document.languageId, text) || text?.startsWith("<svg")) {
-                            Draw.currentPanel._panel.webview.postMessage({ command: 'currentLine', content: content || text });
-                        }
-                }
+                    if (link?.filename && vscode.workspace.workspaceFolders) {
+                        vscode.workspace.fs.readFile(vscode.Uri.file(link.filename)).then((c) => {
+                            content = Buffer.from(c).toString();
+                            if (topush && this.currentEditor)
+                                if (link || text?.startsWith("<svg")) {
+                                    Draw.currentPanel?._panel.webview.postMessage({ command: 'currentLine', content: content || text });
+                                }
+                        });
+                    }
+                } else if (topush && this.currentEditor)
+                    if (text?.startsWith("<svg")) {
+                        Draw.currentPanel?._panel.webview.postMessage({ command: 'currentLine', content: content || text });
+                    }
             }
         }, 100);
     }

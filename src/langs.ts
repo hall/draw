@@ -1,6 +1,3 @@
-import * as path from 'path';
-import * as fs from 'fs';
-import * as crypto from "crypto";
 import * as vscode from "vscode";
 
 const draw = vscode.workspace.getConfiguration("draw");
@@ -14,7 +11,7 @@ const draw = vscode.workspace.getConfiguration("draw");
 export function createLink(editor: vscode.TextEditor, text: string): string {
 
     // defaults
-    let filename = `${crypto.randomUUID()}.svg`;
+    let filename = `${uuidv4()}.svg`;
     let alt = "";
     let link: string;
 
@@ -22,34 +19,37 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
     const match = readLink(editor.document.languageId, text);
     if (match) {
         alt = match["alt"];
-        filename = path.basename(match["filename"]);
-    }
+        const paths = vscode.Uri.file(match["filename"]).path.split("/");
+        filename = paths[paths.length - 1];
+    } else {
 
-    // path to file, start at current editor's directory
-    let filepath = path.dirname(editor.document.fileName);
+        // path to file, start at current editor's directory
+        const paths = vscode.Uri.file(editor.document.fileName).path.split("/");
+        paths.pop();
+        const filepath = paths.join("/");
+
+        if (vscode.workspace.workspaceFolders) {
+            // get the fullpath to the settings directory
+            let settings = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, draw.directory).path;
 
 
-    if (vscode.workspace.workspaceFolders) {
-        // get the fullpath to the settings directory
-        let settings = path.join(vscode.workspace.workspaceFolders[0].uri.path, draw.directory);
+            // TODO: maybe a bug but this var is prefixed with an errant \ on win
+            while (settings.charAt(0) === '\\') settings = settings.substring(1);
 
+            // create the directory, if necessary
+            if (!vscode.Uri.file(settings)) {
+                vscode.workspace.fs.createDirectory(vscode.Uri.file(settings));
+            }
 
-        // TODO: maybe a bug but this var is prefixed with an errant \ on win
-        while (settings.charAt(0) === '\\') settings = settings.substring(1);
+            vscode.workspace.fs.writeFile(vscode.Uri.joinPath(vscode.Uri.file(settings), filename), Buffer.from(text));
 
-        // create the directory, if necessary
-        if (!fs.existsSync(settings)) {
-            fs.mkdirSync(settings, { recursive: true });
+            // prepend settings directory to filename
+            filename = vscode.workspace.asRelativePath(vscode.Uri.joinPath(vscode.Uri.file(settings), filename));
+
+            // get relative path from editor to settings directory
+            filename = relative(vscode.workspace.asRelativePath(vscode.window.activeTextEditor?.document.fileName || ""), filename);
         }
-
-        fs.writeFileSync(path.resolve(settings, filename), text, { encoding: 'utf8' });
-
-        // get relative path from editor to settings directory
-        filepath = path.relative(filepath, settings);
     }
-
-    // append filename to relative path
-    filename = path.join(filepath, filename);
 
     // https://hyperpolyglot.org/lightweight-markup
     switch (editor.document.languageId) {
@@ -83,6 +83,7 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
  * return alt text and filename from link in markup language format
  * @param language a string which identifies the document's format (e.g., `markdown`)
  * @param link the full text of the link itself
+ * @returns absolute path to file, and alt text string
  */
 export function readLink(language: string, link: string): {
     alt: string, filename: string
@@ -117,9 +118,55 @@ export function readLink(language: string, link: string): {
     }
 
     if (match && match?.length > 1 && vscode.window.activeTextEditor) {
-        match[2] = path.resolve(path.dirname(vscode.window.activeTextEditor.document?.fileName), match[2]);
+        const paths = vscode.window.activeTextEditor.document.uri.path.split("/");
+        paths.pop();
+        match[2] = vscode.Uri.joinPath(vscode.Uri.file(paths.join("/")), match[2]).path;
         return { alt: match[1], filename: match[2] };
     }
 
     return undefined;
+}
+
+/**
+ * Generate a random-enough UUID
+ * 
+ * To support running in the browser, we cannot rely on node's crypto library.
+ * 
+ * @returns a UUID-like string
+ */
+function uuidv4(): string {
+    const S4 = function () {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    };
+    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+}
+
+/**
+ * Get path between two files, relative to the workspace root.
+ * 
+ * @param to destination file
+ * @param from start file
+ * @returns relative path from start file to destination file
+ */
+function relative(from: string, to: string): string {
+    // assets/xxxx.svg
+    const toPaths = to.split("/");
+    // one/two/three/xxx.svg
+    const fromPaths = from.split("/");
+    const relativePaths: string[] = [];
+
+    let shared = 0;
+    fromPaths.forEach((path, index) => {
+        // remove common parents
+        if (toPaths[index] == fromPaths[index]) {
+            toPaths.shift();
+            shared++;
+            return;
+        }
+
+        if (index > shared)
+            relativePaths.push("..");
+    });
+
+    return relativePaths.concat(toPaths).join("/");
 }
