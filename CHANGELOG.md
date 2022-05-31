@@ -10,8 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - bundle with webpack (vsix >3MB --> ~150KB)!
 
 ### Changed
-- disable save button when there is no editor
+- disable save button when there is no active editor
 - update font awesome to version 6
+- remove uuid dependency and use node's crypto library instead
 
 ## [0.1.10] - 2022-05-25
 ### Changed

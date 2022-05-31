@@ -19,9 +19,10 @@ module.exports = {
     },
     devtool: 'source-map',
     externals: { // these modules should not be bundled
-        vscode: 'commonjs vscode',
+        crypto: 'commonjs crypto',
         fs: 'commonjs fs',
         path: 'commonjs path',
+        vscode: 'commonjs vscode',
     },
     resolve: {
         extensions: ['.ts', '.html'],

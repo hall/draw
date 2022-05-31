@@ -1,7 +1,7 @@
 *.vsix
 node_modules/
 out/
-main.js*
+/main.js*
 
 test-resources/
 test-results.xml

@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
+import * as crypto from "crypto";
 import * as vscode from "vscode";
-import { v4 as uuidv4 } from "uuid";
 
 const draw = vscode.workspace.getConfiguration("draw");
 
@@ -14,7 +14,7 @@ const draw = vscode.workspace.getConfiguration("draw");
 export function createLink(editor: vscode.TextEditor, text: string): string {
 
     // defaults
-    let filename = `${uuidv4()}.svg`;
+    let filename = `${crypto.randomUUID()}.svg`;
     let alt = "";
     let link: string;
 
