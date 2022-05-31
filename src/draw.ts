@@ -5,7 +5,6 @@ import * as cheerio from "cheerio";
 
 import * as langs from './langs';
 
-// @ts-ignore  
 import html from '../webview/index.html';
 
 export class Draw {
