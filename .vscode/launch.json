@@ -11,9 +11,9 @@
                 "--disable-extensions"
             ],
             "outFiles": [
-                "${workspaceFolder}/out/**/*.js"
+                "${workspaceFolder}/*.js"
             ],
-            "preLaunchTask": "npm: watch",
+            "preLaunchTask": "npm: webpack",
         },
         {
             "name": "Test",

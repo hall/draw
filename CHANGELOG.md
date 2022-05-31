@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- bundle with webpack (vsix >3MB --> ~150KB)!
+
 ### Changed
 - disable save button when there is no editor
 - update font awesome to version 6

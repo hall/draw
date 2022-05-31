@@ -1,4 +1,4 @@
-import vscode = require("vscode");
+import * as vscode from "vscode";
 
 // prompt user for provider and credentials
 export function init(context: vscode.ExtensionContext) {

@@ -7,9 +7,12 @@
         ],
         "outDir": "out",
         "sourceMap": true,
-        "rootDir": "src",
+        "rootDir": ".",
         "strict": true,
     },
+    "include": [
+        "test"
+    ],
     "exclude": [
         "node_modules",
         "test-resources"

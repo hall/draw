@@ -1,7 +1,7 @@
-import vscode = require("vscode");
+import * as vscode from "vscode";
 
 import { Draw, getWebviewOptions } from './draw';
-import htr = require("./htr");
+import * as htr from "./htr";
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
