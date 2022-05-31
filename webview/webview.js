@@ -86,9 +86,9 @@ const drawAPI = {
           button.appendChild(icon);
           button.onclick = new Function(c.function);
 
-          let custom = document.querySelector('#custom-buttons')
+          let custom = document.querySelector('#custom-buttons');
           custom.innerHTML += "\n"; // for some reason, the spacing is off w/o this newline
-          custom.appendChild(button)
+          custom.appendChild(button);
         }
       });
     },
@@ -115,10 +115,10 @@ window.addEventListener('message', event => {
     case 'setState':
       switch (message.state) {
         case 'enabled':
-          document.querySelector("#svg-save").parentElement.disabled = false;
+          document.querySelector("#svg-save").disabled = false;
           break;
         case 'disabled':
-          document.querySelector("#svg-save").parentElement.disabled = true;
+          document.querySelector("#svg-save").disabled = true;
           break;
 
       }

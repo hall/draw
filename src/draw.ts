@@ -128,7 +128,7 @@ export class Draw {
             currentEditor_ = activeTextEditor;
         }
         if (!currentEditor_ || currentEditor_.document.isClosed) {
-            Draw.currentPanel?.disable();
+            Draw.currentPanel?.setState();
             // if (show) vscode.window.showErrorMessage('No active line');
             return {};
         }
@@ -146,6 +146,7 @@ export class Draw {
         const { text, currentEditor_, currentLine_ } = this.getEditorText(true);
         if (typeof text === 'string' && Draw.currentPanel) {
             this.currentEditor = currentEditor_;
+            this.setState();
             this.currentLine = currentLine_;
             Draw.currentPanel._panel.webview.postMessage({ command: 'currentLine', content: text });
         }
@@ -157,16 +158,12 @@ export class Draw {
      * This is generally done when either there is no active editor or the
      * correct one is ambiguous.
      */
-    public disable(): void {
-        if (!this.currentEditor)
+    public setState(): void {
+        if (!this.currentEditor || this.currentEditor.document.isClosed) {
             Draw.currentPanel?._panel.webview.postMessage({ command: "setState", state: "disabled" });
-    }
-
-    /**
-     * enable the panel's interactions with the editor
-     */
-    public enable(): void {
-        Draw.currentPanel?._panel.webview.postMessage({ command: "setState", state: "enabled" });
+        } else {
+            Draw.currentPanel?._panel.webview.postMessage({ command: "setState", state: "enabled" });
+        }
     }
 
     /**
@@ -183,6 +180,7 @@ export class Draw {
                 this.updateCheckStrings[1] = this.updateCheckStrings[0];
                 this.updateCheckStrings[0] = text;
                 this.currentEditor = currentEditor_;
+                this.setState();
                 this.currentLine = currentLine_;
                 let content;
                 if (Draw.settings.directory) {
