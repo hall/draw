@@ -38,6 +38,7 @@ export class Draw {
      * @param context the current extension context
      */
     public static createOrShow(context: vscode.ExtensionContext): void {
+        this.configure(context);
 
         // If we already have a panel, show it.
         if (Draw.currentPanel) {
@@ -49,6 +50,22 @@ export class Draw {
         Draw.currentPanel = new Draw(vscode.window.createWebviewPanel(
             Draw.viewType, 'Draw', vscode.ViewColumn.Three,
             getWebviewOptions(context.extensionUri)), context);
+    }
+
+
+    /**
+     * (Re-)Configure panel settings
+     * @param context 
+     */
+    public static configure(context: vscode.ExtensionContext) {
+        context.secrets.get("provider").then((provider: any) => {
+            if (provider !== undefined) {
+                Draw.currentPanel?._panel.webview.postMessage({
+                    command: 'providerConfigured',
+                    provider: provider
+                });
+            }
+        });
     }
 
     private constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext) {
@@ -111,6 +128,7 @@ export class Draw {
      */
     public static revive(panel: vscode.WebviewPanel, context: vscode.ExtensionContext) {
         Draw.currentPanel = new Draw(panel, context);
+        this.configure(context);
     }
 
     /**
@@ -263,7 +281,16 @@ export class Draw {
         });
     }
 
+    /**
+     * temp? function to post a message to the webview
+     * @param any 
+     */
+    public message(any: any) {
+        Draw.currentPanel?._panel.webview.postMessage(any);
+    }
+
 }
+
 
 /**
  * get options for webview panel

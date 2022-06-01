@@ -21,8 +21,12 @@ body {
   color: var(--vscode-focusBorder);
 }
 
-.svg-container {
+#svg-container {
   height: calc(100vh - 38px);
+}
+
+.dragged-over {
+  background-color: var(--vscode-editorGroup-dropBackground);
 }
 
 #svg {

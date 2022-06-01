@@ -19,10 +19,18 @@ const drawAPI = {
      */
     getSVGElement: () => svgElement,
     /**
-     * 
-     * @param {(dataURL:String)=>undefined} cb callback
+     * Get PNG data URL of canvas or uploaded image
      */
-    getPNG(cb) {
+    getPNG() {
+      // if there's an uploaded image (e.g., from drag-n-drop), use that
+      const holder = document.getElementById("image-holder");
+      if (holder.hasAttribute("src")) {
+        let src = holder.getAttribute("src");
+        // remove it so we don't use it again
+        holder.removeAttribute("src");
+        return new Promise((resolve, reject) => resolve(src));
+      }
+
       var svg = drawAPI.unstable.getSVGElement();
       var { x, y, width, height } = svg.getBBox();
       var b = 10;
@@ -49,13 +57,15 @@ const drawAPI = {
       ctx2.scale(r, r);
       var img = new Image();
       setsize(img, wb, hb);
-      img.onload = function () {
-        ctx2.drawImage(img, 0, 0);
-        ctx.putImageData(ctx2.getImageData((x - b) * r, (y - b) * r, w * r, h * r), 0, 0);
-        cb(can.toDataURL());
-        // document.body.append(can)
-      };
       img.src = 'data:image/svg+xml;base64,' + btoa(data);
+
+      return new Promise((resolve, reject) => {
+        img.onload = function () {
+          ctx2.drawImage(img, 0, 0);
+          ctx.putImageData(ctx2.getImageData((x - b) * r, (y - b) * r, w * r, h * r), 0, 0);
+          resolve(can.toDataURL());
+        };
+      });
     },
     reRegisterSVG() {
       exposedFunctions.reInit();
@@ -109,8 +119,18 @@ window.addEventListener('message', event => {
     case 'customButtons':
       drawAPI.unstable.custom(message.content);
       break;
+    case 'providerConfigured':
+      if (["mathpix"].indexOf(message.provider) > -1) {
+        enableDragAndDrop(message.provider);
+      }
+      break;
     case 'recognize':
-      window[message.provider](message.token);
+      window[message.provider](message.token).then(r => {
+        if (r) drawAPI.unstable.editCurrentLine({
+          control: 0,
+          text: `$$${r}$$`
+        });
+      });
       break;
     case 'setState':
       switch (message.state) {
@@ -120,11 +140,82 @@ window.addEventListener('message', event => {
         case 'disabled':
           document.querySelector("#svg-save").disabled = true;
           break;
-
       }
       break;
   }
 });
+
+/**
+ * some providers support drag-n-drop so let's add some functionality and
+ * styling
+ */
+function enableDragAndDrop(provider) {
+
+  function getImage(dataTransfer) {
+    return new Promise((resolve, reject) => {
+
+      var file = null;
+      if (dataTransfer?.items) {
+        for (let i = 0; i < dataTransfer.items.length; i++) {
+          if (dataTransfer.items[i].type.indexOf('image') !== -1) {
+            file = dataTransfer.items[i].getAsFile();
+            break;
+          }
+        }
+      } else {
+        for (let i = 0; i < dataTransfer.files.length; i++) {
+          file = dataTransfer.files[i];
+          break;
+        }
+      }
+      if (file) {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function (event) {
+          resolve(event.target.result);
+        };
+      }
+    });
+
+  }
+
+  const container = document.getElementById("svg-container");
+  const dragClass = "dragged-over";
+  container.ondragenter = function (e) {
+    e.target.classList.add(dragClass);
+  };
+  container.ondragleave = function (e) {
+    e.target.classList.remove(dragClass);
+  };
+
+  container.ondragover = function (e) {
+    e.preventDefault();
+    e.target.classList.add(dragClass);
+  };
+  container.ondragend = function (e) {
+    e.preventDefault();
+    e.target.classList.remove(dragClass);
+  };
+
+  container.ondrop = function (e) {
+    e.preventDefault(); // file from being opened
+    e.target.classList.remove(dragClass);
+
+    getImage(e.dataTransfer).then((data) => {
+      let holder = document.getElementById("image-holder");
+      holder.src = data;
+      drawAPI.unstable.recognize(provider);
+    });
+  };
+
+  // container.onpaste = function (e) {
+  //   getImage(e.clipboardData).then((data) => {
+  //     let holder = document.getElementById("image-holder");
+  //     holder.src = data;
+  //     drawAPI.unstable.recognize(provider);
+  //   });
+  // };
+}
 
 
 (function () {

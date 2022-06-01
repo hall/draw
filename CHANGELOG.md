@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+### Fixed
+- mathpix image upload
+
+### Added
+- drag-n-drop hover effect
+
 ## [0.1.13] - 2022-05-31
 
 ### Fixed
