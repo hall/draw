@@ -19,14 +19,15 @@
 		"Other"
 	],
 	"keywords": [
-		"markdown",
+		"HTR",
+		"OCR",
 		"asciidoc",
-		"restructuredtext",
-		"note",
 		"draw",
 		"latex",
-		"OCR",
-		"HTR",
+		"markdown",
+		"math",
+		"note",
+		"restructuredtext",
 		"svg"
 	],
 	"activationEvents": [
