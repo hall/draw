@@ -2,13 +2,14 @@ import * as vscode from 'vscode';
 
 import * as langs from './langs';
 import html from '../webview/index.html';
+import * as pkg from '../package.json';
 
 export class Draw {
     /** singleton of the currently open panel */
     public static currentPanel: Draw | undefined;
 
     /** id which defines the webpanel view type */
-    public static readonly viewType = 'draw';
+    public static readonly viewType = pkg.name;
 
     /** user-provided settings */
     public static settings = vscode.workspace.getConfiguration(Draw.viewType);
@@ -48,7 +49,7 @@ export class Draw {
 
         // Otherwise, create a new panel.
         Draw.currentPanel = new Draw(vscode.window.createWebviewPanel(
-            Draw.viewType, 'Draw', vscode.ViewColumn.Three,
+            Draw.viewType, pkg.displayName, vscode.ViewColumn.Three,
             getWebviewOptions(context.extensionUri)), context);
     }
 
