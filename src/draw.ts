@@ -4,9 +4,18 @@ import * as langs from './langs';
 import html from '../webview/index.html';
 import * as pkg from '../package.json';
 
+type Target = {
+    /** the target editor for modification */
+    editor: vscode.TextEditor | undefined;
+    /** the current line number in the target editor */
+    line: number | undefined;
+    /** the text on the targetLine of the targetEditor */
+    text: string | undefined;
+};
+
 export class Draw {
     /** singleton of the currently open panel */
-    public static currentPanel: Draw | undefined;
+    public static panel: vscode.WebviewPanel | undefined;
 
     /** id which defines the webpanel view type */
     public static readonly viewType = pkg.name;
@@ -14,73 +23,51 @@ export class Draw {
     /** user-provided settings */
     public static settings = vscode.workspace.getConfiguration(Draw.viewType);
 
-    /** the webview panel object */
-    private readonly _panel: vscode.WebviewPanel;
-    /** the current extension uri */
-    private readonly _extensionUri: vscode.Uri;
     /** a list of disposable objects */
     private _disposables: vscode.Disposable[] = [];
 
-    /** the target editor for modification */
-    private currentEditor: vscode.TextEditor | undefined = undefined;
-    /** the current line number in the target editor */
-    private currentLine: number | undefined = 0;
-    /** the text on the currentLine of the currentEditor */
-    private currentText: string | undefined = "";
-    private updateHandle: any = undefined;
+    /** the target editor */
+    private target: Target = {
+        editor: undefined,
+        line: undefined,
+        text: undefined
+    };
 
-    private updateCheckStrings = ['', ''];
+    /** store the current and previous line for comparison  */
+    private check = ['', ''];
 
-    /** a pseudo-randomly generated value */
-    private nonce = nonce();
 
     /**
      * create a new panel, or show the existing one, if available
      * @param context the current extension context
      */
-    public static createOrShow(context: vscode.ExtensionContext): void {
-        this.configure(context);
-
-        // If we already have a panel, show it.
-        if (Draw.currentPanel) {
-            Draw.currentPanel._panel.reveal(vscode.window?.activeTextEditor?.viewColumn);
+    public constructor(context: vscode.ExtensionContext, panel: vscode.WebviewPanel | undefined = undefined) {
+        // if we already have a panel, just show it
+        if (Draw.panel) {
+            Draw.panel.reveal(vscode.window?.activeTextEditor?.viewColumn);
             return;
         }
 
-        // Otherwise, create a new panel.
-        Draw.currentPanel = new Draw(vscode.window.createWebviewPanel(
-            Draw.viewType, pkg.displayName, vscode.ViewColumn.Three,
-            getWebviewOptions(context.extensionUri)), context);
-    }
+        // use the panel given, if any (e.g., during a state restore)
+        // otherwise, create a new panel
+        Draw.panel = panel ?? vscode.window.createWebviewPanel(
+            Draw.viewType,
+            pkg.displayName,
+            vscode.ViewColumn.Three,
+            getWebviewOptions(context.extensionUri)
+        );
 
-
-    /**
-     * (Re-)Configure panel settings
-     * @param context 
-     */
-    public static configure(context: vscode.ExtensionContext) {
-        context.secrets.get("provider").then((provider: any) => {
-            if (provider !== undefined) {
-                Draw.currentPanel?._panel.webview.postMessage({
-                    command: 'providerConfigured',
-                    provider: provider
-                });
-            }
-        });
-    }
-
-    private constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext) {
-        this._panel = panel;
-        this._extensionUri = context.extensionUri;
+        Draw.configure(context);
 
         // Set the webview's initial html content
-        this._panel.webview.html = html;
+        Draw.panel.webview.html = html;
 
-        // Listen for when the panel is disposed
+        // listen for when the panel is disposed
         // This happens when the user closes the panel or when the panel is closed programmatically
-        this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+        Draw.panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
-        this._panel.webview.onDidReceiveMessage(message => {
+        // listen for messages from the webview process
+        Draw.panel.webview.onDidReceiveMessage(message => {
             switch (message.command) {
                 case 'requestCurrentLine':
                     this.pushCurrentLine();
@@ -90,10 +77,10 @@ export class Draw {
                     return;
                 case 'editCurrentLine':
                     this.setEditorText(message.text, message.control);
-                    break;
+                    return;
                 case 'recognize':
                     context.secrets.get("token").then((token: any) => {
-                        Draw.currentPanel?._panel.webview.postMessage({
+                        Draw.panel?.webview.postMessage({
                             command: 'recognize',
                             token: token,
                             provider: message.provider
@@ -110,62 +97,59 @@ export class Draw {
     }
 
     /**
+     * (re-)configure panel settings
+     */
+    public static configure(context: vscode.ExtensionContext) {
+        context.secrets.get("provider").then((provider: any) => {
+            if (provider !== undefined) {
+                Draw.panel?.webview.postMessage({
+                    command: 'providerConfigured',
+                    provider: provider
+                });
+            }
+        });
+    }
+
+    /**
      * remove the panel and dispose of its objects
      */
     public dispose(): void {
-        Draw.currentPanel = undefined;
-        this._panel.dispose();
+        Draw.panel?.dispose();
+        Draw.panel = undefined;
 
-        // TODO: should include updateHandle?
         while (this._disposables.length) {
             this._disposables.pop()?.dispose();
         }
     }
 
     /**
-     * recreate the panel
-     * @param panel
-     * @param context 
+     * get the target editor
      */
-    public static revive(panel: vscode.WebviewPanel, context: vscode.ExtensionContext) {
-        Draw.currentPanel = new Draw(panel, context);
-        this.configure(context);
-    }
+    private getTarget(): Target | undefined {
+        const editor = vscode.window.activeTextEditor ?? this.target.editor;
+        const line = editor?.selection.active.line ?? this.target.line;
 
-    /**
-     * get text from the editor
-     * @param show true if an error message should be displayed on error
-     * @returns 
-     */
-    private getEditorText(show: boolean) { //: { text: string, currentEditor_: vscode.TextEditor, currentLine_: number } {
-        let currentEditor_ = this.currentEditor;
-        let currentLine_ = this.currentLine;
-        const activeTextEditor = vscode.window.activeTextEditor;
-        if (activeTextEditor) {
-            currentEditor_ = activeTextEditor;
+        if (!editor || editor.document.isClosed) {
+            this.setState();
+            return undefined;
         }
-        if (!currentEditor_ || currentEditor_.document.isClosed) {
-            Draw.currentPanel?.setState();
-            // if (show) vscode.window.showErrorMessage('No active line');
-            return {};
-        }
-        currentLine_ = currentEditor_.selection.active.line;
 
-        const text = currentEditor_.document.getText(new vscode.Range(currentLine_, 0, currentLine_ + 1, 0));
-        this.currentText = text;
-        return { text, currentEditor_, currentLine_ };
+        let text;
+        if (line !== undefined) {
+            text = this.target.text = editor.document.getText(new vscode.Range(line, 0, line + 1, 0));
+        }
+        return { editor, line, text };
     }
 
     /**
      * Copy svg back to editor
      */
     private pushCurrentLine(): void {
-        const { text, currentEditor_, currentLine_ } = this.getEditorText(true);
-        if (typeof text === 'string' && Draw.currentPanel) {
-            this.currentEditor = currentEditor_;
+        const target = this.getTarget();
+        if (typeof target?.text === 'string' && Draw.panel) {
+            this.target = target;
             this.setState();
-            this.currentLine = currentLine_;
-            Draw.currentPanel._panel.webview.postMessage({ command: 'currentLine', content: text });
+            Draw.panel.webview.postMessage({ command: 'currentLine', content: target.text });
         }
     }
 
@@ -176,45 +160,45 @@ export class Draw {
      * correct one is ambiguous.
      */
     public setState(): void {
-        if (!this.currentEditor || this.currentEditor.document.isClosed) {
-            Draw.currentPanel?._panel.webview.postMessage({ command: "setState", state: "disabled" });
-        } else {
-            Draw.currentPanel?._panel.webview.postMessage({ command: "setState", state: "enabled" });
+        let state = "enabled";
+        if (!this.target.editor || this.target.editor.document.isClosed) {
+            state = "disabled";
         }
+        Draw.panel?.webview.postMessage({ command: "setState", state: state });
     }
 
     /**
-     * start an update loop to continuously update the editor
+     * start an update loop to continuously update the canvas
      */
     private realTimeCurrentEditorUpdate() {
-        this.updateHandle = setInterval(() => {
-            const { text, currentEditor_, currentLine_ } = this.getEditorText(false);
-            if (typeof text === 'string' && Draw.currentPanel) {
-                let topush = false;
-                if (this.updateCheckStrings[0] !== this.updateCheckStrings[1] && text === this.updateCheckStrings[0]) {
-                    topush = true;
+        setInterval(() => {
+            const target = this.getTarget();
+            if (typeof target?.text !== 'string') return;
+
+            this.check[1] = this.check[0];
+            this.check[0] = target?.text || '';
+
+            this.target = target;
+            this.setState();
+
+            if (Draw.settings.directory) {
+                const link = langs.readLink(this.target.editor?.document.languageId || "markdown", target.text);
+                if (link?.filename && vscode.workspace.workspaceFolders) {
+                    vscode.workspace.fs.readFile(vscode.Uri.file(link.filename)).then((c) => {
+                        target.text = Buffer.from(c).toString();
+                        Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
+                    });
                 }
-                this.updateCheckStrings[1] = this.updateCheckStrings[0];
-                this.updateCheckStrings[0] = text;
-                this.currentEditor = currentEditor_;
-                this.setState();
-                this.currentLine = currentLine_;
-                let content;
-                if (Draw.settings.directory) {
-                    const link = langs.readLink(this.currentEditor?.document.languageId || "markdown", text);
-                    if (link?.filename && vscode.workspace.workspaceFolders) {
-                        vscode.workspace.fs.readFile(vscode.Uri.file(link.filename)).then((c) => {
-                            content = Buffer.from(c).toString();
-                            if (topush && this.currentEditor)
-                                if (link || text?.startsWith("<svg")) {
-                                    Draw.currentPanel?._panel.webview.postMessage({ command: 'currentLine', content: content || text });
-                                }
-                        });
+            } else {
+                // text is probably an svg element
+                if (target.text.startsWith("<svg")) {
+
+                    if (this.target.editor && (this.check[0] !== this.check[1]) && (target.text === this.check[0])) {
+                        console.log("in");
+                        Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
                     }
-                } else if (topush && this.currentEditor)
-                    if (text?.startsWith("<svg")) {
-                        Draw.currentPanel?._panel.webview.postMessage({ command: 'currentLine', content: content || text });
-                    }
+
+                }
             }
         }, 100);
     }
@@ -225,34 +209,34 @@ export class Draw {
      */
     private setEditorText(text: string, control: number): void {
 
-        if (!this.currentEditor || this.currentEditor.document.isClosed) {
+        // the save button _should_ be disabled if there's no active editor
+        // but let's check and show an error message anyway, just in case
+        if (!this.target.editor || this.target.editor.document.isClosed) {
             vscode.window.showErrorMessage('The text editor has been closed');
             return;
         }
 
-        // if a directory is set and current line is not latex, set the text to a link
+        // if a directory is set, and current line is not latex, replace the text with a link
         if (Draw.settings.directory && !text.startsWith("$$")) {
-            text = langs.createLink(this.currentEditor, text);
+            text = langs.createLink(this.target.editor, text);
         }
 
-        let p;
-        if (this.currentLine !== undefined) {
-            p = vscode.window.showTextDocument(this.currentEditor.document, {
-                viewColumn: this.currentEditor.viewColumn,
-                selection: new vscode.Range(this.currentLine, 0, this.currentLine, 0)
-            }).then((editor) => editor.edit(edit => {
-                if (this.currentLine !== undefined)
-                    edit.replace(new vscode.Range(this.currentLine, 0, this.currentLine + 1, 0), text + '\n');
-                this.updateCheckStrings[0] = this.updateCheckStrings[1] = text.split('\n')[0] + '\n';
-            }));
-        }
-
-        if (control !== 0 && p) {
-            p = p.then(() => {
-                if (this.currentEditor && this.currentLine)
-                    vscode.window.showTextDocument(this.currentEditor.document, {
-                        viewColumn: this.currentEditor.viewColumn,
-                        selection: new vscode.Range(this.currentLine + control, 0, this.currentLine + control, 0)
+        if (this.target.line !== undefined) {
+            vscode.window.showTextDocument(this.target.editor.document, {
+                viewColumn: this.target.editor.viewColumn,
+            }).then(editor => {
+                editor.edit(edit => {
+                    if (this.target.line !== undefined)
+                        edit.replace(new vscode.Range(this.target.line, 0, this.target.line + 1, 0), text + '\n');
+                    this.check[0] = this.check[1] = text.split('\n')[0];
+                });
+            }).then(() => {
+                vscode.commands.executeCommand('cursorMove', { to: "wrappedLineStart" });
+            }).then(() => {
+                if (control !== 0 && this.target.editor && this.target.line)
+                    vscode.window.showTextDocument(this.target.editor.document, {
+                        viewColumn: this.target.editor.viewColumn,
+                        selection: new vscode.Range(this.target.line + control, 0, this.target.line + control, 0)
                     });
             }).then(() => {
                 this.pushCurrentLine();
@@ -275,7 +259,7 @@ export class Draw {
                 }].concat(buttons);
             }
 
-            Draw.currentPanel?._panel.webview.postMessage({
+            Draw.panel?.webview.postMessage({
                 command: 'customButtons',
                 content: buttons
             });
@@ -287,7 +271,7 @@ export class Draw {
      * @param any 
      */
     public message(any: any) {
-        Draw.currentPanel?._panel.webview.postMessage(any);
+        Draw.panel?.webview.postMessage(any);
     }
 
 }
@@ -303,15 +287,4 @@ export function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptio
         enableScripts: true,
         localResourceRoots: []
     };
-}
-
-
-// generate a nonce
-function nonce() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 32; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
 }
