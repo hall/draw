@@ -20,4 +20,10 @@ export function activate(context: vscode.ExtensionContext) {
       new Draw(context, panel);
     }
   });
+
+  vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {
+    if (event.affectsConfiguration(Draw.viewType)) {
+      Draw.settings = vscode.workspace.getConfiguration(Draw.viewType);
+    }
+  });
 }

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+### Changed
+- pull updated settings without a reload
+
 ## [0.1.14] - 2022-06-01
 ### Fixed
 - mathpix image upload
