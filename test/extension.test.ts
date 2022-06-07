@@ -1,4 +1,4 @@
-import { By, Editor, EditorView, TextEditor, TextSetting, VSBrowser, WebElement, WebView, Workbench } from 'vscode-extension-tester';
+import { By, EditorView, TextEditor, TextSetting, VSBrowser, WebElement, WebView, Workbench } from 'vscode-extension-tester';
 import { expect } from 'chai';
 
 import * as pkg from '../package.json';
@@ -69,7 +69,6 @@ describe('Extension', () => {
             const directory = await settings.findSetting("Directory", "Draw") as TextSetting;
             await directory.setValue("assets");
             await view.closeEditor("Settings");
-            await sleep(1000);
 
             await webview.switchToFrame();
             await webview.getDriver().actions().dragAndDrop(canvas, { x: 150, y: -200 }).perform();
