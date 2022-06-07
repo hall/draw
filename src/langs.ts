@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
-
-const draw = vscode.workspace.getConfiguration("draw");
+import { Draw } from './draw';
 
 /**
  * return a formatted link to a file (relative to the current
@@ -13,59 +12,52 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
     // defaults
     let filename = `${uuidv4()}.svg`;
     let alt = "";
-    let link: string;
+
+    let settings = Draw.settings.directory;
+    if (vscode.workspace.workspaceFolders) {
+        // prepend workspace folder to settings directory
+        settings = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, settings).path;
+
+        // TODO: maybe a bug but this var is prefixed with an errant \ on win
+        while (settings.charAt(0) === '\\') settings = settings.substring(1);
+    }
+
+    // create the directory, if necessary
+    if (!vscode.Uri.file(settings)) {
+        vscode.workspace.fs.createDirectory(vscode.Uri.file(settings));
+    }
 
     // reuse existing alt and filename, if available
-    const match = readLink(editor.document.languageId, text);
+    const current = editor.document.lineAt(editor.selection.active.line).text;
+    const match = readLink(editor.document.languageId, current);
     if (match) {
         alt = match["alt"];
         const paths = vscode.Uri.file(match["filename"]).path.split("/");
         filename = paths[paths.length - 1];
-    } else {
-
-        // path to file, start at current editor's directory
-        const paths = vscode.Uri.file(editor.document.fileName).path.split("/");
-        paths.pop();
-        const filepath = paths.join("/");
-
-        if (vscode.workspace.workspaceFolders) {
-            // get the fullpath to the settings directory
-            let settings = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, draw.directory).path;
-
-
-            // TODO: maybe a bug but this var is prefixed with an errant \ on win
-            while (settings.charAt(0) === '\\') settings = settings.substring(1);
-
-            // create the directory, if necessary
-            if (!vscode.Uri.file(settings)) {
-                vscode.workspace.fs.createDirectory(vscode.Uri.file(settings));
-            }
-
-            vscode.workspace.fs.writeFile(vscode.Uri.joinPath(vscode.Uri.file(settings), filename), Buffer.from(text));
-
-            // prepend settings directory to filename
-            filename = vscode.workspace.asRelativePath(vscode.Uri.joinPath(vscode.Uri.file(settings), filename));
-
-            // get relative path from editor to settings directory
-            filename = relative(vscode.workspace.asRelativePath(vscode.window.activeTextEditor?.document.fileName || ""), filename);
-        }
+        console.log("matched: " + filename);
     }
+
+    // write contents to absolute path {settings}/{filename}
+    vscode.workspace.fs.writeFile(vscode.Uri.joinPath(vscode.Uri.file(settings), filename), Buffer.from(text));
+
+    // prepend absolute path to settings directory to filename
+    filename = vscode.Uri.joinPath(vscode.Uri.file(settings), filename).path;
+
+    // get relative path from editor to settings directory
+    filename = relative(editor.document.fileName, filename);
 
     // https://hyperpolyglot.org/lightweight-markup
     switch (editor.document.languageId) {
 
         case 'asciidoc':
-            link = `image::${filename}[${alt}]`;
-            break;
+            return `image::${filename}[${alt}]`;
 
         case 'restructuredtext':
-            link = `.. image:: ${filename}`; // TODO: add alt text `\n   :alt: ${alt}`
-            break;
+            return `.. image:: ${filename}`; // TODO: add alt text `\n   :alt: ${alt}`
 
         case 'markdown':
         default:
-            link = `![${alt}](${filename})`;
-            break;
+            return `![${alt}](${filename})`;
 
         // case 'mediawiki':
         //   return `[[File:${filename}|alt=${alt}]]`
@@ -74,9 +66,6 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
         //   return `[[${filename}]]`
 
     }
-
-
-    return link;
 }
 
 /**
@@ -118,9 +107,6 @@ export function readLink(language: string, link: string): {
     }
 
     if (match && match?.length > 1 && vscode.window.activeTextEditor) {
-        const paths = vscode.window.activeTextEditor.document.uri.path.split("/");
-        paths.pop();
-        match[2] = vscode.Uri.joinPath(vscode.Uri.file(paths.join("/")), match[2]).path;
         return { alt: match[1], filename: match[2] };
     }
 
@@ -144,29 +130,30 @@ function uuidv4(): string {
 /**
  * Get path between two files, relative to the workspace root.
  * 
- * @param to destination file
- * @param from start file
+ * @param from absolute path to start file
+ * @param to absolute path to destination file
  * @returns relative path from start file to destination file
  */
 function relative(from: string, to: string): string {
-    // assets/xxxx.svg
-    const toPaths = to.split("/");
-    // one/two/three/xxx.svg
-    const fromPaths = from.split("/");
+    console.log("relative: " + from + " -> " + to);
+    // /full/path/to/assets/xxxx.svg
+    const toPaths = to.substring(1).split("/");
+    // /full/path/to/file/in/workspace/xxx.md
+    const fromPaths = from.substring(1).split("/");
+
     const relativePaths: string[] = [];
 
     let shared = 0;
     fromPaths.forEach((path, index) => {
         // remove common parents
-        if (toPaths[index] == fromPaths[index]) {
-            toPaths.shift();
+        if (toPaths[index] == path) {
             shared++;
             return;
         }
 
-        if (index > shared)
-            relativePaths.push("..");
+        if (index > shared) relativePaths.push("..");
     });
 
-    return relativePaths.concat(toPaths).join("/");
+
+    return relativePaths.concat(toPaths.slice(shared)).join("/");
 }

@@ -174,6 +174,11 @@ export class Draw {
         setInterval(() => {
             const target = this.getTarget();
             if (typeof target?.text !== 'string') return;
+            let topush = false;
+            if (this.check[0] !== this.check[1] && target.text === this.check[0]) {
+                topush = true;
+            }
+
 
             this.check[1] = this.check[0];
             this.check[0] = target?.text || '';
@@ -183,10 +188,15 @@ export class Draw {
 
             if (Draw.settings.directory) {
                 const link = langs.readLink(this.target.editor?.document.languageId || "markdown", target.text);
+                const paths = this.target.editor?.document.uri.path.split("/");
+                if (link && paths) {
+                    paths.pop();
+                    link.filename = vscode.Uri.joinPath(vscode.Uri.file(paths.join("/")), link.filename).path;
+                }
                 if (link?.filename && vscode.workspace.workspaceFolders) {
                     vscode.workspace.fs.readFile(vscode.Uri.file(link.filename)).then((c) => {
                         target.text = Buffer.from(c).toString();
-                        Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
+                        if (topush) Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
                     });
                 }
             } else {
@@ -194,8 +204,7 @@ export class Draw {
                 if (target.text.startsWith("<svg")) {
 
                     if (this.target.editor && (this.check[0] !== this.check[1]) && (target.text === this.check[0])) {
-                        console.log("in");
-                        Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
+                        if (topush) Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
                     }
 
                 }
@@ -217,7 +226,7 @@ export class Draw {
         }
 
         // if a directory is set, and current line is not latex, replace the text with a link
-        if (Draw.settings.directory && !text.startsWith("$$")) {
+        if (Draw.settings.directory && Draw.settings.directory !== "" && !text.startsWith("$$")) {
             text = langs.createLink(this.target.editor, text);
         }
 
@@ -227,8 +236,8 @@ export class Draw {
             }).then(editor => {
                 editor.edit(edit => {
                     if (this.target.line !== undefined)
-                        edit.replace(new vscode.Range(this.target.line, 0, this.target.line + 1, 0), text + '\n');
-                    this.check[0] = this.check[1] = text.split('\n')[0];
+                        edit.replace(new vscode.Range(this.target.line, 0, this.target.line + 1, 0), text);
+                    this.check[0] = this.check[1] = text;
                 });
             }).then(() => {
                 vscode.commands.executeCommand('cursorMove', { to: "wrappedLineStart" });

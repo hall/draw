@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+### Fixed
+- reuse filename when editing an existing file
+
 ### Changed
 - pull updated settings without a reload
 

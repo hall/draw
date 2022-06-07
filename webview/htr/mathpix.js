@@ -13,7 +13,6 @@ function mathpix(token) {
                 }),
             }).then(response => response.json())
                 .then(data => {
-                    console.log("DATA: " + JSON.stringify(data));
                     if (data["error"]) {
                         reject(data["error"]);
                     } else {
