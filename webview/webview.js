@@ -240,7 +240,7 @@ function enableDragAndDrop(provider) {
     const state = vscode.getState();
     if (state && "svg" in state) {
       // use saved state, if any
-      svgElement.innerHTML = state["svg"];
+      initPaint("svg");
     } else {
       // or start with drawing under selection
       vscode.postMessage({ command: 'requestCurrentLine' });

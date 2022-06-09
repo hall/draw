@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- don't cut off buttons when the page wraps
+- re-init canvas on restore (this preserves, e.g., the undo/redo list)
 
 ## [0.1.15] - 2022-06-07
 ### Fixed
