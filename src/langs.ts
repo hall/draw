@@ -34,7 +34,6 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
         alt = match["alt"];
         const paths = vscode.Uri.file(match["filename"]).path.split("/");
         filename = paths[paths.length - 1];
-        console.log("matched: " + filename);
     }
 
     // write contents to absolute path {settings}/{filename}
@@ -135,7 +134,6 @@ function uuidv4(): string {
  * @returns relative path from start file to destination file
  */
 function relative(from: string, to: string): string {
-    console.log("relative: " + from + " -> " + to);
     // /full/path/to/assets/xxxx.svg
     const toPaths = to.substring(1).split("/");
     // /full/path/to/file/in/workspace/xxx.md

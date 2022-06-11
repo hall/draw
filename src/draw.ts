@@ -17,7 +17,7 @@ export class Draw {
     /** singleton of the currently open panel */
     public static panel: vscode.WebviewPanel | undefined;
 
-    /** id which defines the webpanel view type */
+    /** id which defines the webPanel view type */
     public static readonly viewType = pkg.name;
 
     /** user-provided settings */
@@ -174,9 +174,9 @@ export class Draw {
         setInterval(() => {
             const target = this.getTarget();
             if (typeof target?.text !== 'string') return;
-            let topush = false;
+            let push = false;
             if (this.check[0] !== this.check[1] && target.text === this.check[0]) {
-                topush = true;
+                push = true;
             }
 
 
@@ -196,7 +196,7 @@ export class Draw {
                 if (link?.filename && vscode.workspace.workspaceFolders) {
                     vscode.workspace.fs.readFile(vscode.Uri.file(link.filename)).then((c) => {
                         target.text = Buffer.from(c).toString();
-                        if (topush) Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
+                        if (push) Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
                     });
                 }
             } else {
@@ -204,7 +204,7 @@ export class Draw {
                 if (target.text.startsWith("<svg")) {
 
                     if (this.target.editor && (this.check[0] !== this.check[1]) && (target.text === this.check[0])) {
-                        if (topush) Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
+                        if (push) Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
                     }
 
                 }

@@ -8,15 +8,15 @@ Thanks for your interest in contributing! There's a lot to be done :)
 
 Ideally, a local dev setup is as easy as:
 
- - open the repo in VSCode
- - run `npm i` in the terminal
- - press `F5` to start the extension
+- open the repo in VSCode
+- run `npm i` in the terminal
+- press `F5` to start the extension
 
 This, however, relies on your host machine having, at least, node (v16, at this time) installed. One way to setup your environment is with [nix](https://nixos.org/): by running `nix develop` from the root of the repo.
 
 ## test
 
-Currently, the only tests are an e2e suite under the `./test` directory. These are executed in CI but `npm run test` will run them locally.
+Currently, the only tests are an e2e suite under the [`./test`](./test) directory. These are executed in CI but `npm test` will run them locally.
 
 ## release
 

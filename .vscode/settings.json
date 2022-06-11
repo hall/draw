@@ -1,3 +1,9 @@
 {
-    "debug.node.autoAttach": "on"
+    "debug.node.autoAttach": "on",
+    "cSpell.words": [
+        "HMAC",
+        "mathpix",
+        "myscript",
+        "zhaouv"
+    ]
 }

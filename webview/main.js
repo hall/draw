@@ -7,16 +7,17 @@ if (typeof require !== 'undefined') {
 
 window.paints = [];
 
-// convent a css color name to its hex value
-function getHexColor(str) {
-  var canvas = document.createElement('canvas');
-  let ctx = canvas.getContext('2d');
-  ctx.fillStyle = str;
-  let hex = ctx.fillStyle;
-  canvas.remove();
-  return hex
-}
-
+/**
+ * Create an SVG path of a rectangle
+ * 
+ * @param {float} x horizontal position of upper-left corner
+ * @param {float} y vertical position of upper-left corner
+ * @param {float} width 
+ * @param {float} height 
+ * @param {float} rx 
+ * @param {float} ry 
+ * @returns 
+ */
 function rect2path(x, y, width, height, rx, ry) {
   x = parseFloat(x);
   y = parseFloat(y);
@@ -47,6 +48,15 @@ function rect2path(x, y, width, height, rx, ry) {
   return path;
 }
 
+/**
+ * Create an SVG path of an ellipse
+ * 
+ * @param {float} cx horizontal centerpoint
+ * @param {float} cy vertical centerpoint
+ * @param {float} rx radius on the horizontal axis
+ * @param {float} ry radius on the vertical axis
+ * @returns 
+ */
 function ellipse2path(cx, cy, rx, ry) {
   cx = parseFloat(cx);
   cy = parseFloat(cy);
