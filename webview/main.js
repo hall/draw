@@ -1264,7 +1264,7 @@ exports.initPaint = function (svgId) {
     redoList = [];
     boxSizeList = [];
     redoBoxSizeList = [];
-    svg.innerHTML = "";
+    svg.replaceChildren();
   });
 
   toggle("#show-settings", "#settings");
