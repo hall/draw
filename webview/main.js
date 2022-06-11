@@ -151,7 +151,6 @@ function populate(element, object) {
     option.value = option.innerHTML = option.text = "none";
     element.appendChild(option);
   }
-
 }
 
 /**
@@ -199,7 +198,7 @@ function initConfig() {
       config[property] = e.target.value;
 
       const name = Object.keys(map).find(key => cssResolve(map[key]) == e.target.value);
-      selectOption(select, cssResolve(name in map ? map[name] : "custom"));
+      selectOption(select, cssResolve(name in map && name !== "none" ? map[name] : "custom"));
     });
 
     select.addEventListener("input", e => {
@@ -214,14 +213,23 @@ function initConfig() {
     });
 
     // create initial state
-    custom.value = config[property];
-    custom.dispatchEvent(new Event("change"));
+    let value = config[property];
+    if (map === colors && !value.startsWith("#") && value !== "none") {
+      value = cssResolve(map[value]);
+    }
+
+    if (value === "none") {
+      selectOption(select, "none");
+      select.dispatchEvent(new Event("change"));
+    } else {
+      custom.value = value;
+      custom.dispatchEvent(new Event("change"));
+    }
   }
 
   bind("#select-size", sizes, "#custom-size", "lineWidth");
   bind("#select-color", colors, "#custom-color", "color");
   bind("#select-fill", colors, "#custom-fill", "fillColor");
-
 
   let textSize = document.getElementById("text-size");
   textSize.addEventListener("input", e => {
@@ -229,10 +237,7 @@ function initConfig() {
   });
   textSize.value = config.fontSize;
 
-
-  if (config.show) {
-    document.getElementById("show-settings").click();
-  }
+  if (config.show) document.getElementById("show-settings").click();
 }
 
 exports.initPaint = function (svgId) {

@@ -238,11 +238,11 @@ function enableDragAndDrop(provider) {
     vscode.postMessage({ command: 'requestCustom' });
 
     const state = vscode.getState();
-    if (state && "svg" in state) {
+    if (state) {
       // use saved state, if any
       if ("svg" in state) svgElement.innerHTML = state["svg"];
       if ("config" in state) config = state["config"];
-      drawAPI.unstable.reRegisterSVG();
+      exposedFunctions.reInit();
     } else {
       // or start with drawing under selection
       vscode.postMessage({ command: 'requestCurrentLine' });
