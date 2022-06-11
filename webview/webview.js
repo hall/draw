@@ -240,14 +240,19 @@ function enableDragAndDrop(provider) {
     const state = vscode.getState();
     if (state && "svg" in state) {
       // use saved state, if any
-      initPaint("svg");
+      if ("svg" in state) svgElement.innerHTML = state["svg"];
+      if ("config" in state) config = state["config"];
+      drawAPI.unstable.reRegisterSVG();
     } else {
       // or start with drawing under selection
       vscode.postMessage({ command: 'requestCurrentLine' });
     }
 
     setInterval(() => {
-      vscode.setState({ svg: svgElement.innerHTML });
+      vscode.setState({
+        svg: svgElement.innerHTML,
+        config: config,
+      });
     }, 1000);
 
   }

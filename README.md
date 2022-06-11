@@ -22,7 +22,8 @@ The currently supported formats are
  - asciidoc
  - restructuredtext
 
-## Config
+
+## Settings
 
 The following settings are available (prefixed with `draw`).
 
@@ -31,12 +32,12 @@ The following settings are available (prefixed with `draw`).
 | directory | if set, save files to this directory (relative to the workspace root) | `""`    |
 | buttons   | add [custom buttons](#custom-buttons) to the toolbar                  | `[]`    |
 
-
-## Custom Buttons
+### custom buttons
 
 To add custom buttons to the toolbar, add an entry to the `draw.buttons` array in `settings.json`; for example,
 
 ```json
+{
 "draw.buttons": [
     {
         "icon": "beer",
@@ -44,9 +45,14 @@ To add custom buttons to the toolbar, add an entry to the `draw.buttons` array i
         "function": "console.log('hooray!')"
     }
 ]
+}
 ```
 
 > search the [Font Awesome](https://fontawesome.com/v6/search?m=free&s=solid) set for an icon name
+
+### color scheme
+
+The preset color selections are defined by [VSCode's chart colors](https://code.visualstudio.com/api/references/theme-color#chart-colors) and so can be changed in `settings.json`.
 
 ## Handwritten Text Recognition
 

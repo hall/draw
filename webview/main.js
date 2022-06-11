@@ -66,7 +66,166 @@ function polygon2path(points) {
   return `M ${pointsList[0]} L ${pointsList.splice(1).join(" ")} Z`;
 }
 
-exports.initPaint = function (svgId, conf = null) {
+var config = {
+  lineWidth: 2,
+  color: "blue",
+  fillColor: "none",
+  fontSize: 14,
+
+  eraserSize: 10,
+  fontFamily: "inherit",
+  type: "pen",
+  show: false
+};
+
+/**
+ * Map of color names to values.
+ * 
+ * See: https://code.visualstudio.com/api/references/theme-color#chart-colors
+ */
+var colors = {
+  "blue": "--vscode-charts-blue",
+  "red": "--vscode-charts-red",
+  "yellow": "--vscode-charts-yellow",
+  "orange": "--vscode-charts-orange",
+  "green": "--vscode-charts-green",
+  "purple": "--vscode-charts-purple",
+  // "gray": "--vscode-charts-lines", // TODO: compensate for alpha channel
+  "white": "--vscode-charts-foreground",
+  "black": "#000000"
+}
+
+/**
+ * Map of size names to values.
+ */
+var sizes = {
+  "small": 2,
+  "medium": 4,
+  "large": 8,
+};
+
+/**
+ * Resolve CSS variable if string starts with "--", otherwise, return string as-is
+ * @param {string} value 
+ */
+function cssResolve(value) {
+  if (typeof value === 'string' && value.startsWith("--")) {
+    return window.getComputedStyle(document.documentElement).getPropertyValue(value);
+  }
+  return value;
+}
+
+/**
+ * populate a dropdown element with the presets from object
+ */
+function populate(element, object) {
+  // remove all existing options so the function is idempotent
+  element.replaceChildren();
+
+  let option = document.createElement("vscode-option");
+  option.value = "custom";
+  option.innerHTML = option.text = "--";
+  option.hidden = true;
+  element.appendChild(option);
+
+  Object.keys(object).forEach(name => {
+    let option = document.createElement("vscode-option");
+    option.value = object === colors ? cssResolve(object[name]) : object[name];
+    option.innerHTML = option.text = name;
+    element.appendChild(option);
+  })
+
+  // allow no color (i.e., transparent)
+  if (element.id === "select-fill") {
+    let option = document.createElement("vscode-option");
+    option.value = option.innerHTML = option.text = "none";
+    element.appendChild(option);
+  }
+
+}
+
+/**
+ * Set the selected value of target element
+ * 
+ * @param {*} element input element
+ * @param {string} value option value to select
+ */
+function selectOption(element, value) {
+  if (element.children) {
+    const elm = Array.from(element.children).find(option => option.value == value)
+    if (elm.value === "custom") {
+      // show "custom" option when it's selected as a placeholder
+      elm.hidden = false;
+    } else {
+      // hide "custom" option so it's can't be selected
+      Array.from(element.children).find(option => option.value == "custom").hidden = true;
+    }
+    elm.selected = true;
+    // https://github.com/microsoft/vscode-webview-ui-toolkit/issues/332
+    elm.setAttribute("selected", true);
+  }
+}
+
+/**
+ * (Re-)construct settings values from config
+ */
+function initConfig() {
+  document.querySelector(`[data-type="${config.type}"`).classList.add("active");
+
+  /**
+   * Setup color selector/picker binding and events
+   * 
+   * @param {string} select query selector for select element
+   * @param {string} map map of k/v pairs to populate select element
+   * @param {string} custom query selector for custom element
+   * @param {string} property property of config which custom element is bound
+   */
+  function bind(select, map, custom, property) {
+    select = document.querySelector(select);
+    custom = document.querySelector(custom);
+    populate(select, map);
+
+    custom.addEventListener("change", e => {
+      config[property] = e.target.value;
+
+      const name = Object.keys(map).find(key => cssResolve(map[key]) == e.target.value);
+      selectOption(select, cssResolve(name in map ? map[name] : "custom"));
+    });
+
+    select.addEventListener("input", e => {
+      if (e.target.value == "none") {
+        custom.style.opacity = 0.5;
+        config[property] = "none";
+      } else if (e.target.value != "custom") {
+        custom.style.opacity = 1;
+        custom.value = cssResolve(e.target.value);
+        custom.dispatchEvent(new Event("change"));
+      }
+    });
+
+    // create initial state
+    custom.value = config[property];
+    custom.dispatchEvent(new Event("change"));
+  }
+
+  bind("#select-size", sizes, "#custom-size", "lineWidth");
+  bind("#select-color", colors, "#custom-color", "color");
+  bind("#select-fill", colors, "#custom-fill", "fillColor");
+
+
+  let textSize = document.getElementById("text-size");
+  textSize.addEventListener("input", e => {
+    config.fontSize = e.target.value;
+  });
+  textSize.value = config.fontSize;
+
+
+  if (config.show) {
+    document.getElementById("show-settings").click();
+  }
+}
+
+exports.initPaint = function (svgId) {
   if (window.paints[svgId]) {
     return;
   } else {
@@ -76,27 +235,6 @@ exports.initPaint = function (svgId, conf = null) {
   var svg = document.getElementById(svgId);
   // var svgOffset = svg.getBoundingClientRect();
 
-  var config = {
-    color: "#6190e8",
-    fillColor: "none",
-    lineWidth: 2,
-    eraserSize: 10,
-    fontFamily: "inherit",
-    fontSize: 14,
-    type: "pen",
-    ...conf
-  };
-
-  document.querySelector(`[data-type="${config.type}"`).classList.add("active");
-  document.querySelector("#select-color").value = "custom";
-  document.querySelector("#custom-color").value = config.color;
-  document.querySelector("#select-size").value = "custom";
-  document.querySelector("#custom-size").value = config.lineWidth;
-  document.querySelector("#select-fill-color").value =
-    config.fillColor === "none" ? "none" : "custom";
-  document.querySelector("#custom-fill-color").value =
-    config.fillColor === "none" ? "black" : config.fillColor;
-  document.querySelector("#text-size").value = config.fontSize;
 
   var drawMoveOpen = false;
   var selectHasMove = false;
@@ -122,6 +260,7 @@ exports.initPaint = function (svgId, conf = null) {
       undoList.push(item);
       boxSizeList.push(item.getBBox());
     }
+    initConfig();
   };
   reInit();
 
@@ -142,7 +281,8 @@ exports.initPaint = function (svgId, conf = null) {
 
   var drawDown = e => {
     // TODO: also modify the display of the interface
-    if (e.buttons === 32) {
+    if (e.buttons === 32 || e.buttons == 4) {
+      // 4 => middle click or stylus back (?) button
       config.type = "eraser";
     }
     if (
@@ -1095,59 +1235,6 @@ exports.initPaint = function (svgId, conf = null) {
     });
   });
 
-  document.querySelector("#select-color").addEventListener("change", e => {
-    let custom = document.querySelector("#custom-color")
-    config.color = e.target.value === "custom" ? custom.value : e.target.value;
-    custom.value = getHexColor(e.target.value);
-  });
-
-  document.querySelector("#custom-color").addEventListener("input", e => {
-    document.querySelector("#select-color").value = "custom"
-    config.color = e.target.value;
-  });
-
-  document.querySelector("#select-size").addEventListener("change", e => {
-    let custom = document.querySelector("#custom-size")
-    switch (e.target.value) {
-      case "custom":
-        config.lineWidth = custom.value;
-        break;
-      case "small":
-        config.lineWidth = 2;
-        break;
-      case "medium":
-        config.lineWidth = 4;
-        break;
-      case "large":
-        config.lineWidth = 8;
-        break;
-    }
-    if (e.target.value !== "custom") {
-      custom.value = config.lineWidth;
-    }
-  });
-
-  document.querySelector("#custom-size").addEventListener("change", e => {
-    if (document.querySelector("#select-size").value === "custom") {
-      config.lineWidth = e.target.value;
-    }
-  });
-
-  document.querySelector("#select-fill-color").addEventListener("change", e => {
-    let custom = document.querySelector("#custom-fill-color");
-    config.fillColor = e.target.value === "custom" ? custom.value : e.target.value;
-    custom.value = getHexColor(e.target.value);
-  });
-
-  document.querySelector("#custom-fill-color").addEventListener("input", e => {
-    document.querySelector("#select-fill-color").value = "custom";
-    config.fillColor = e.target.value;
-  });
-
-  document.querySelector("#text-size").addEventListener("change", e => {
-    config.fontSize = e.target.value;
-  });
-
   document.querySelectorAll(".svg-shape vscode-button").forEach(item => {
     click(item, (e) => {
       document.querySelector("#svg-buttons .active")?.classList.remove("active");
@@ -1277,9 +1364,11 @@ function toggle(buttonSel, targetSel) {
     if (target.style.display === 'none') {
       target.style.display = '';
       button.classList.add("active");
+      config.show = true;
     } else {
       target.style.display = 'none';
       button.classList.remove("active");
+      config.show = false;
     }
   });
 

@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- use VSCode's chart color variables
+
+### Added
+- map eraser to middle click (which is a button on, at least, some styluses)
+- persist canvas settings and selections
+
 ### Fixed
 - don't cut off buttons when the page wraps
 - re-init canvas on restore (this preserves, e.g., the undo/redo list)
