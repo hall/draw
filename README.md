@@ -13,15 +13,27 @@ Draw an SVG image with a mouse or pen.
 
 Open a file (in a supported format) and run `Draw: Edit Current Line` by either
 
- - right clicking on the line or
- - opening the command palette (`F1` or `Ctrl-Shft-P`) and type `draw edit`
+- right clicking on the line or
+- opening the command palette (`F1` or `Ctrl-Shift-P`) and type `draw edit`
 
 The currently supported formats are
 
- - markdown
- - asciidoc
- - restructuredtext
+- markdown
+- asciidoc
+- restructuredtext
 
+## Keybindings
+
+Consider binding the main command (perhaps to a stylus, if available). For example, the tail button on my stylus sends the `Super + Escape` key sequence:
+
+```json
+{
+    "key": "meta+Escape",
+    "command": "draw.editCurrentLine"
+}
+```
+
+> **NOTE**: you may have to disable, or rebind, conflicting keys in your OS settings.
 
 ## Settings
 
@@ -38,13 +50,13 @@ To add custom buttons to the toolbar, add an entry to the `draw.buttons` array i
 
 ```json
 {
-"draw.buttons": [
-    {
-        "icon": "beer",
-        "title": "pour another",
-        "function": "console.log('hooray!')"
-    }
-]
+    "draw.buttons": [
+        {
+            "icon": "beer",
+            "title": "pour another",
+            "function": "console.log('hooray!')"
+        }
+    ]
 }
 ```
 
@@ -62,9 +74,9 @@ The following services are available to convert hand-written formulas to LaTeX e
 
 > free for 2000 requests/month
 
- - create [an account](https://developer.myscript.com/getting-started/web)
- - generate application and HMAC tokens
- - run `Draw: Configure HTR Provider` and select `myscript`
+- create [an account](https://developer.myscript.com/getting-started/web)
+- generate application and HMAC tokens
+- run `Draw: Configure HTR Provider` and select `myscript`
 
 ### mathpix
 
@@ -72,10 +84,9 @@ The following services are available to convert hand-written formulas to LaTeX e
 
 This integration also supports image drag and paste.
 
- - create [an account](https://mathpix.com/docs/ocr/overview)
- - create an org, pay the setup fee, and create an API key
- - run `Draw: Configure HTR Provider` and select `mathpix`
-
+- create [an account](https://mathpix.com/docs/ocr/overview)
+- create an org, pay the setup fee, and create an API key
+- run `Draw: Configure HTR Provider` and select `mathpix`
 
 ## License
 

@@ -6,7 +6,7 @@ import * as pkg from '../package.json';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
-    vscode.commands.registerCommand(`${pkg.name}.editCurrentLineAsSVG`, () => {
+    vscode.commands.registerCommand(`${pkg.name}.editCurrentLine`, () => {
       new Draw(context);
     }),
     vscode.commands.registerCommand(`${pkg.name}.configureHTR`, () => {

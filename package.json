@@ -32,7 +32,7 @@
 	],
 	"activationEvents": [
 		"onWebviewPanel:draw",
-		"onCommand:draw.editCurrentLineAsSVG",
+		"onCommand:draw.editCurrentLine",
 		"onCommand:draw.configureHTR",
 		"onLanguage:markdown",
 		"onLanguage:asciidoc",
@@ -66,7 +66,7 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "draw.editCurrentLineAsSVG",
+				"command": "draw.editCurrentLine",
 				"title": "Edit Current Line",
 				"category": "Draw",
 				"icon": "$(pencil)"
@@ -80,7 +80,7 @@
 		"menus": {
 			"editor/context": [
 				{
-					"command": "draw.editCurrentLineAsSVG",
+					"command": "draw.editCurrentLine",
 					"when": "editorFocus",
 					"group": "7_modification"
 				}
