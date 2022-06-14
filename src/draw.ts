@@ -193,7 +193,7 @@ export class Draw {
                     paths.pop();
                     link.filename = vscode.Uri.joinPath(vscode.Uri.file(paths.join("/")), link.filename).path;
                 }
-                if (link?.filename && vscode.workspace.workspaceFolders) {
+                if (link?.filename) {
                     vscode.workspace.fs.readFile(vscode.Uri.file(link.filename)).then((c) => {
                         target.text = Buffer.from(c).toString();
                         if (push) Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });

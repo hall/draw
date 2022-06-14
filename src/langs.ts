@@ -14,13 +14,13 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
     let alt = "";
 
     let settings = Draw.settings.directory;
-    if (vscode.workspace.workspaceFolders) {
-        // prepend workspace folder to settings directory
-        settings = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, settings).path;
 
-        // TODO: maybe a bug but this var is prefixed with an errant \ on win
-        while (settings.charAt(0) === '\\') settings = settings.substring(1);
-    }
+    // prepend workspace folder to settings directory
+    const ws = vscode.workspace.getWorkspaceFolder(editor.document.uri)
+    settings = vscode.Uri.joinPath(ws?.uri || vscode.Uri.file(""), settings).path;
+
+    // TODO: maybe a bug but this var is prefixed with an errant \ on win
+    while (settings.charAt(0) === '\\') settings = settings.substring(1);
 
     // create the directory, if necessary
     if (!vscode.Uri.file(settings)) {

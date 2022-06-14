@@ -28,7 +28,8 @@
 		"math",
 		"note",
 		"restructuredtext",
-		"svg"
+		"svg",
+		"multi-root ready"
 	],
 	"activationEvents": [
 		"onWebviewPanel:draw",

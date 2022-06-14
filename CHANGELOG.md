@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- support multiple workspace roots
+
 ## [0.1.17] - 2022-06-10
 
 ### Fixed
