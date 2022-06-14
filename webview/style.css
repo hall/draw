@@ -30,7 +30,6 @@ body {
 }
 
 #svg {
-  cursor: crosshair;
   padding: 0px;
   touch-action: none;
   background-size: 20px 20px;
