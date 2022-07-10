@@ -174,11 +174,11 @@ export class Draw {
         setInterval(() => {
             const target = this.getTarget();
             if (typeof target?.text !== 'string') return;
+
             let push = false;
             if (this.check[0] !== this.check[1] && target.text === this.check[0]) {
                 push = true;
             }
-
 
             this.check[1] = this.check[0];
             this.check[0] = target?.text || '';
@@ -241,6 +241,8 @@ export class Draw {
                 });
             }).then(() => {
                 vscode.commands.executeCommand('cursorMove', { to: "wrappedLineStart" });
+                // trigger an update to preserve the canvas contents
+                this.check[1] = '';
             }).then(() => {
                 if (control !== 0 && this.target.editor && this.target.line)
                     vscode.window.showTextDocument(this.target.editor.document, {

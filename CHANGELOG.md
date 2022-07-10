@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - create relative paths on Windows
+- retain drawing on canvas after save
 
 ## [0.1.18] - 2022-06-13
 
