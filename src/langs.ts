@@ -10,7 +10,7 @@ import { Draw } from './draw';
 export function createLink(editor: vscode.TextEditor, text: string): string {
 
     // defaults
-    let filename = `${uuidv4()}.svg`;
+    let uri = vscode.Uri.file(`${uuidv4()}.svg`);
     let alt = "";
 
     let settings = Draw.settings.directory;
@@ -18,9 +18,6 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
     // prepend workspace folder to settings directory
     const ws = vscode.workspace.getWorkspaceFolder(editor.document.uri)
     settings = vscode.Uri.joinPath(ws?.uri || vscode.Uri.file(""), settings).path;
-
-    // TODO: maybe a bug but this var is prefixed with an errant \ on win
-    while (settings.charAt(0) === '\\') settings = settings.substring(1);
 
     // create the directory, if necessary
     if (!vscode.Uri.file(settings)) {
@@ -33,17 +30,17 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
     if (match) {
         alt = match["alt"];
         const paths = vscode.Uri.file(match["filename"]).path.split("/");
-        filename = paths[paths.length - 1];
+        uri = vscode.Uri.file(paths[paths.length - 1]);
     }
 
     // write contents to absolute path {settings}/{filename}
-    vscode.workspace.fs.writeFile(vscode.Uri.joinPath(vscode.Uri.file(settings), filename), Buffer.from(text));
+    vscode.workspace.fs.writeFile(vscode.Uri.joinPath(vscode.Uri.file(settings), uri.path), Buffer.from(text));
 
     // prepend absolute path to settings directory to filename
-    filename = vscode.Uri.joinPath(vscode.Uri.file(settings), filename).path;
+    uri = vscode.Uri.joinPath(vscode.Uri.file(settings), uri.path);
 
     // get relative path from editor to settings directory
-    filename = relative(editor.document.fileName, filename);
+    let filename = scoped(editor.document.uri, uri).fsPath.substring(1);
 
     // https://hyperpolyglot.org/lightweight-markup
     switch (editor.document.languageId) {
@@ -127,17 +124,17 @@ function uuidv4(): string {
 }
 
 /**
- * Get path between two files, relative to the workspace root.
+ * Get a uri between two files, scoped to the workspace root.
  * 
- * @param from absolute path to start file
- * @param to absolute path to destination file
- * @returns relative path from start file to destination file
+ * @param from absolute uri to start file
+ * @param to absolute uri to destination file
+ * @returns uri from start file to destination file
  */
-function relative(from: string, to: string): string {
+function scoped(from: vscode.Uri, to: vscode.Uri): vscode.Uri {
     // /full/path/to/assets/xxxx.svg
-    const toPaths = to.substring(1).split("/");
+    const toPaths = to.path.substring(1).split("/");
     // /full/path/to/file/in/workspace/xxx.md
-    const fromPaths = from.substring(1).split("/");
+    const fromPaths = from.path.substring(1).split("/");
 
     const relativePaths: string[] = [];
 
@@ -152,6 +149,5 @@ function relative(from: string, to: string): string {
         if (index > shared) relativePaths.push("..");
     });
 
-
-    return relativePaths.concat(toPaths.slice(shared)).join("/");
+    return vscode.Uri.file(relativePaths.concat(toPaths.slice(shared)).join("/"));
 }
