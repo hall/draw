@@ -7,3 +7,5 @@ test-resources/
 test/resources/assets
 test-results.xml
 index.scip
+
+.direnv/
