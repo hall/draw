@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- set cursor over drawing area to a small dot
+
 ## [0.1.19] - 2022-07-09
 
 ### Fixed

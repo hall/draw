@@ -3,21 +3,12 @@
  */
 
 //
-// stylus
+// pointer
 //
 
-document.onpointerenter = (e) => {
-    if (e.pointerType === "pen") document.body.style.cursor = "none";
-};
-document.onpointerdown = (e) => {
-    if (e.pointerType === "pen") document.body.style.cursor = "none";
-};
-document.onpointerup = (e) => {
-    if (e.pointerType !== "pen") document.body.style.cursor = "crosshair";
-};
-document.onpointermove = (e) => {
-    document.body.style.cursor = e.pointerType === "mouse" ? "crosshair" : "none";
-};
+// css does not allow variables in `url` so we use js instead
+let cursorColor = getComputedStyle(document.body).getPropertyValue('--vscode-panel-border');
+document.body.style.cursor = `url("data:image/svg+xml, <svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='3' cy='3' r='3' fill='${cursorColor}'/></svg>") 1 1, crosshair`;
 
 //
 // keybindings
