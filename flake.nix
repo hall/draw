@@ -1,19 +1,22 @@
 {
-  inputs.utils.url = "github:numtide/flake-utils";
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs";
+    utils.url = "github:numtide/flake-utils";
+  };
 
-  outputs = inputs@{ self, nixpkgs, ... }:
+  outputs = inputs@{ self, ... }:
     inputs.utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system}; in
+      let pkgs = inputs.nixpkgs.legacyPackages.${system}; in
       {
         devShell = (pkgs.buildFHSUserEnvBubblewrap {
           name = "fhs";
           runScript = "bash";
           targetPkgs = pkgs: with pkgs; [
-	    # dev
+            # dev
             nodejs
             gitlab-runner
 
-	    # test
+            # test
             alsa-lib
             at-spi2-atk
             at-spi2-core
