@@ -8,44 +8,22 @@
     inputs.utils.lib.eachDefaultSystem (system:
       let pkgs = inputs.nixpkgs.legacyPackages.${system}; in
       {
-        devShell = (pkgs.buildFHSUserEnvBubblewrap {
-          name = "fhs";
-          runScript = "bash";
-          targetPkgs = pkgs: with pkgs; [
-            # dev
-            nodejs
-            gitlab-runner
-
-            # test
-            alsa-lib
-            at-spi2-atk
-            at-spi2-core
-            atk
-            cairo
-            dbus
-            expat
-            gdk-pixbuf
-            glib
-            gtk3
-            libdrm
-            libxkbcommon
-            mesa
-            nspr
-            nss
-            pango
-            xorg.libX11
-            xorg.libXcomposite
-            xorg.libXdamage
-            xorg.libXext
-            xorg.libXfixes
-            xorg.libXrandr
-            xorg.libxcb
-
-            libdbusmenu
-            (lib.getLib systemd)
-            fontconfig.lib
+        packages.default = pkgs.buildNpmPackage {
+          name = "draw";
+          src = ./.;
+          npmDepsHash = "sha256-/aW1tyzE6WK4zBAOep4BhBM4W6/ZjpoBEpZ50eMVnM4=";
+          nativeBuildInputs = with pkgs; [
+            pkg-config
+            python3
           ];
-        }).env;
+          buildInputs = with pkgs; [
+            libsecret
+          ];
 
+          installPhase = ''
+            mkdir -p $out
+            cp ./*.vsix $out/
+          '';
+        };
       });
 }

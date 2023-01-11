@@ -1,0 +1,52 @@
+name: Main
+on:
+  pull_request:
+  push:
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: checkout repo
+      uses: actions/checkout@v3
+
+    - name: install nix
+      uses: cachix/install-nix-action@v18
+
+    - name: check flake
+      run: nix flake check
+
+    - name: build package
+      id: package
+      run: |
+        nix build
+        echo ::set-output name=path::result/*.vsix
+
+    - name: get latest tag
+      id: latest
+      run: echo ::set-output name=version::$(git describe --abbrev=0 --tags --match 'v[0-9]*\.[0-9]*\.[0-9]*' | cut -c2-)
+
+    - name: parse changelog
+      id: changelog
+      uses: coditory/changelog-parser@v1
+
+    - name: create release
+      uses: softprops/action-gh-release@v1
+      if: github.ref == 'refs/heads/main' && steps.changelog.outputs.version != steps.latest.outputs.version
+      with:
+        files: ${{ steps.package.outputs.path }}
+        body: ${{ steps.changelog.outputs.description }}
+        tag_name: ${{ steps.changelog.outputs.version }}
+
+    - name: publish to Open VSX
+      uses: HaaLeo/publish-vscode-extension@v1
+      with:
+        pat: ${{ secrets.OPENVSX_ACCESS_TOKEN }}
+        extensionFile: ${{ steps.package.outputs.path }}
+
+    - name: publish to VS Marketplace
+      uses: HaaLeo/publish-vscode-extension@v1
+      with:
+        pat: ${{ secrets.AZURE_ACCESS_TOKEN }}
+        registryUrl: https://marketplace.visualstudio.com
+        extensionFile: ${{ steps.package.outputs.path }}
