@@ -16,7 +16,7 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
     let settings = Draw.settings.directory;
 
     // prepend workspace folder to settings directory
-    const ws = vscode.workspace.getWorkspaceFolder(editor.document.uri)
+    const ws = vscode.workspace.getWorkspaceFolder(editor.document.uri);
     settings = vscode.Uri.joinPath(ws?.uri || vscode.Uri.file(""), settings).path;
 
     // create the directory, if necessary
@@ -40,7 +40,7 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
     uri = vscode.Uri.joinPath(vscode.Uri.file(settings), uri.path);
 
     // get relative path from editor to settings directory
-    let filename = scoped(editor.document.uri, uri).fsPath.substring(1);
+    const filename = scoped(editor.document.uri, uri).fsPath.substring(1);
 
     // https://hyperpolyglot.org/lightweight-markup
     switch (editor.document.languageId) {
