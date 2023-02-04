@@ -20,6 +20,15 @@
             libsecret
           ];
 
+          postBuild = ''
+            dir=archive
+            mkdir $dir
+            fname=$(ls *.vsix)
+            ${pkgs.unzip}/bin/unzip $fname -d $dir
+            find $dir -type f -exec touch {} \;
+            (cd $dir && ${pkgs.zip}/bin/zip -r ../$fname .)
+          '';
+
           installPhase = ''
             mkdir -p $out
             cp ./*.vsix $out/
