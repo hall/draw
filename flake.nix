@@ -11,7 +11,7 @@
         packages.default = pkgs.buildNpmPackage {
           name = "draw";
           src = ./.;
-          npmDepsHash = "sha256-/aW1tyzE6WK4zBAOep4BhBM4W6/ZjpoBEpZ50eMVnM4=";
+          npmDepsHash = "sha256-vf9kTOx6HGaCP7vSYXQyVT+KedI2uj0HEeqd80Bz86o=";
           nativeBuildInputs = with pkgs; [
             pkg-config
             python3
