@@ -39,10 +39,19 @@ Consider binding the main command (perhaps to a stylus, if available). For examp
 
 The following settings are available (prefixed with `draw`).
 
-| setting   | description                                                           | default |
-| --------- | --------------------------------------------------------------------- | ------- |
-| directory | if set, save files to this directory (relative to the workspace root) | `""`    |
-| buttons   | add [custom buttons](#custom-buttons) to the toolbar                  | `[]`    |
+| setting     | description                                          | default | example                     |
+| ----------- | ---------------------------------------------------- | ------- | --------------------------- |
+| `directory` | where to save files                                  | `""`    | `${workSpaceFolder}/assets` |
+| `buttons`   | add [custom buttons](#custom-buttons) to the toolbar | `[]`    | _see below_                 |
+
+### directory
+
+To save contents inline, set `draw.directory` to `null`.
+
+The following [variables](https://code.visualstudio.com/docs/editor/variables-reference) are currently supported:
+
+  - `workspaceFolder`
+
 
 ### custom buttons
 

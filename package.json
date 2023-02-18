@@ -118,9 +118,9 @@
 					}
 				},
 				"draw.directory": {
-					"type": "string",
+					"type": ["string", "null"],
 					"default": "",
-					"description": "Save to directory (write inline if blank)"
+					"description": "Save to directory (write inline if null)"
 				}
 			}
 		}

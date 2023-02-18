@@ -13,15 +13,25 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
     let uri = vscode.Uri.file(`${uuidv4()}.svg`);
     let alt = "";
 
-    let settings = Draw.settings.directory;
+    // create variables for replacement
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(editor.document.uri)?.uri.fsPath;
 
-    // prepend workspace folder to settings directory
-    const ws = vscode.workspace.getWorkspaceFolder(editor.document.uri);
-    settings = vscode.Uri.joinPath(ws?.uri || vscode.Uri.file(""), settings).path;
+    // replace supported variables
+    let directory = Draw.settings.directory.replace('${workspaceFolder}', workspaceFolder)
+
+    // if not an absolute path, prepend current directory
+    if (!directory.startsWith("/")) {
+        // get path to current file
+        const fsPath = editor.document.uri.fsPath;
+        // get directory of said file
+        const fileDirname = fsPath.slice(0, fsPath.lastIndexOf("/"));
+        // prepend directory to setting
+        directory = vscode.Uri.joinPath(vscode.Uri.file(fileDirname) || vscode.Uri.file(""), directory).path;
+    }
 
     // create the directory, if necessary
-    if (!vscode.Uri.file(settings)) {
-        vscode.workspace.fs.createDirectory(vscode.Uri.file(settings));
+    if (!vscode.Uri.file(directory)) {
+        vscode.workspace.fs.createDirectory(vscode.Uri.file(directory));
     }
 
     // reuse existing alt and filename, if available
@@ -34,10 +44,10 @@ export function createLink(editor: vscode.TextEditor, text: string): string {
     }
 
     // write contents to absolute path {settings}/{filename}
-    vscode.workspace.fs.writeFile(vscode.Uri.joinPath(vscode.Uri.file(settings), uri.path), Buffer.from(text));
+    vscode.workspace.fs.writeFile(vscode.Uri.joinPath(vscode.Uri.file(directory), uri.path), Buffer.from(text));
 
     // prepend absolute path to settings directory to filename
-    uri = vscode.Uri.joinPath(vscode.Uri.file(settings), uri.path);
+    uri = vscode.Uri.joinPath(vscode.Uri.file(directory), uri.path);
 
     // get relative path from editor to settings directory
     const filename = scoped(editor.document.uri, uri).fsPath.substring(1);
