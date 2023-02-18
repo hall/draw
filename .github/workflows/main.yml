@@ -6,50 +6,49 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
 
-    - name: checkout repo
-      uses: actions/checkout@v3
+      - name: install nix
+        uses: cachix/install-nix-action@v18
 
-    - name: install nix
-      uses: cachix/install-nix-action@v18
+      - name: check flake
+        run: nix flake check
 
-    - name: check flake
-      run: nix flake check
+      - name: build package
+        id: package
+        run: |
+          nix build
+          echo path=$(echo result/*.vsix) >> $GITHUB_OUTPUT
 
-    - name: build package
-      id: package
-      run: |
-        nix build
-        echo path=$(echo result/*.vsix) >> $GITHUB_OUTPUT
+      - name: get latest tag
+        id: latest
+        uses: WyriHaximus/github-action-get-previous-tag@v1
 
-    - name: get latest tag
-      id: latest
-      run: echo version=$(git describe --abbrev=0 --tags --match 'v[0-9]*\.[0-9]*\.[0-9]*' | cut -c2-) >> $GITHUB_OUTPUT
+      - name: parse changelog
+        id: changelog
+        uses: coditory/changelog-parser@v1
 
-    - name: parse changelog
-      id: changelog
-      uses: coditory/changelog-parser@v1
+      - name: create release
+        id: release
+        uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/main' && steps.changelog.outputs.version != steps.latest.outputs.tag
+        with:
+          files: ${{ steps.package.outputs.path }}
+          body: ${{ steps.changelog.outputs.description }}
+          tag_name: ${{ steps.changelog.outputs.version }}
 
-    - name: create release
-      id: release
-      uses: softprops/action-gh-release@v1
-      if: github.ref == 'refs/heads/main' && steps.changelog.outputs.version != steps.latest.outputs.version
-      with:
-        files: ${{ steps.package.outputs.path }}
-        body: ${{ steps.changelog.outputs.description }}
-        tag_name: ${{ steps.changelog.outputs.version }}
+      - name: publish to Open VSX
+        uses: HaaLeo/publish-vscode-extension@v1
+        if: steps.release.outcome == 'success'
+        with:
+          pat: ${{ secrets.OPENVSX_ACCESS_TOKEN }}
+          extensionFile: ${{ steps.package.outputs.path }}
 
-    - name: publish to Open VSX
-      uses: HaaLeo/publish-vscode-extension@v1
-      if: steps.release.outcome == 'success'
-      with:
-        pat: ${{ secrets.OPENVSX_ACCESS_TOKEN }}
-        extensionFile: ${{ steps.package.outputs.path }}
-
-    - name: publish to VS Marketplace
-      uses: HaaLeo/publish-vscode-extension@v1
-      if: steps.release.outcome == 'success'
-      with:
-        pat: ${{ secrets.AZURE_ACCESS_TOKEN }}
-        registryUrl: https://marketplace.visualstudio.com
-        extensionFile: ${{ steps.package.outputs.path }}
+      - name: publish to VS Marketplace
+        uses: HaaLeo/publish-vscode-extension@v1
+        if: steps.release.outcome == 'success'
+        with:
+          pat: ${{ secrets.AZURE_ACCESS_TOKEN }}
+          registryUrl: https://marketplace.visualstudio.com
+          extensionFile: ${{ steps.package.outputs.path }}
