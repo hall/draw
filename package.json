@@ -68,7 +68,7 @@
 		"commands": [
 			{
 				"command": "draw.editCurrentLine",
-				"title": "Edit Current Line",
+				"title": "Edit Drawing",
 				"category": "Draw",
 				"icon": "$(pencil)"
 			},
