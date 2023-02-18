@@ -33,8 +33,6 @@
 	],
 	"activationEvents": [
 		"onWebviewPanel:draw",
-		"onCommand:draw.editCurrentLine",
-		"onCommand:draw.configureHTR",
 		"onLanguage:markdown",
 		"onLanguage:asciidoc",
 		"onLanguage:restructuredtext"
