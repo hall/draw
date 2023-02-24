@@ -7,8 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+This release reworks the `draw.directory` setting to behave like a more standard filepath. Specifically, it's now relative to the current file (unless the path is absolute).
+
+To use the previous default behavior of inlining the svg content, set it to `null`. 
+
+To make the path relative to workspace root, use the `workspaceFolder` variable (e.g., `${workspaceFolder}/assets`).
+
+### Added
+
+- allow using the `${workspaceFolder}` variable in the `draw.directory` setting
+
 ### Changed
 
+- **BREAKING**: `draw.directory` is now relative to the current file if an absolute path is not given
+- **BREAKING**: to save files inline, `draw.directory` now must be `null` instead of an empty string
 - rename main command title from  `Edit Current Line` to `Edit Drawing` for clarity
 
 ## [0.1.21] - 2023-02-04

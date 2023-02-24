@@ -186,7 +186,12 @@ export class Draw {
             this.target = target;
             this.setState();
 
-            if (Draw.settings.directory) {
+            if (target.text.startsWith("<svg")) {
+                // text is probably an svg element
+                if (this.target.editor && (this.check[0] !== this.check[1]) && (target.text === this.check[0])) {
+                    if (push) Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
+                }
+            } else {
                 const link = langs.readLink(this.target.editor?.document.languageId || "markdown", target.text);
                 const paths = this.target.editor?.document.uri.path.split("/");
                 if (link && paths) {
@@ -199,15 +204,7 @@ export class Draw {
                         if (push) Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
                     });
                 }
-            } else {
-                // text is probably an svg element
-                if (target.text.startsWith("<svg")) {
 
-                    if (this.target.editor && (this.check[0] !== this.check[1]) && (target.text === this.check[0])) {
-                        if (push) Draw.panel?.webview.postMessage({ command: 'currentLine', content: target.text });
-                    }
-
-                }
             }
         }, 100);
     }
@@ -226,7 +223,7 @@ export class Draw {
         }
 
         // if a directory is set, and current line is not latex, replace the text with a link
-        if (Draw.settings.directory && Draw.settings.directory !== "" && !text.startsWith("$$")) {
+        if (Draw.settings.directory !== null && !text.startsWith("$$")) {
             text = langs.createLink(this.target.editor, text);
         }
 
