@@ -2,7 +2,7 @@
 	"name": "draw",
 	"displayName": "Draw",
 	"description": "Draw an SVG image with a mouse or pen",
-	"version": "0.1.21",
+	"version": "0.2.0",
 	"publisher": "hall",
 	"icon": "docs/images/icon.png",
 	"license": "Apache-2.0",

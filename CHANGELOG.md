@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2023-02-24
+
 This release reworks the `draw.directory` setting to behave like a more standard filepath. Specifically, it's now relative to the current file (unless the path is absolute).
 
 To use the previous default behavior of inlining the svg content, set it to `null`. 
